@@ -3,14 +3,14 @@
   <div class="header-bar">
     <div class="breadcrumbs">
       <!-- 全部 -->
-      <span class="bc-item" [class.active]="selectedDispatchFilter === null" (click)="selectedDispatchFilter = null">
+      <span class="bc-item" [class.active]="selectedDispatchFilter === null" (click)="selectFilter(null)">
         <nz-tag [nzColor]="selectedDispatchFilter === null ? 'green' : 'default'">全部 ({{ totalDispatchCount }})</nz-tag>
       </span>
       <!-- 每个已勾选的预派工单 -->
       <ng-container *ngFor="let item of dispatchOrderItems">
         <span class="bc-sep">&gt;</span>
-        <span class="bc-item" [class.active]="selectedDispatchFilter === item.dispatchNo" (click)="selectedDispatchFilter = item.dispatchNo">
-          <nz-tag [nzColor]="selectedDispatchFilter === item.dispatchNo ? 'green' : 'default'">{{ item.dispatchNo }} ({{ item.count }})</nz-tag>
+        <span class="bc-item" [class.active]="selectedDispatchFilter === item.dispatchNo" (click)="selectFilter(item.dispatchNo)">
+          <nz-tag [nzColor]="selectedDispatchFilter === item.dispatchNo ? 'green' : 'default'">{{ item.deptName }} ({{ item.count }})</nz-tag>
         </span>
       </ng-container>
     </div>
@@ -76,25 +76,26 @@
         >{{ lockWorkCenter ? '🔒' : '🔓' }}</span>
       </div>
 
-      <!-- 分配表格（使用nz-table） -->
+      <!-- 分配表格（展示工单明细） -->
       <div class="table-wrapper">
         <table class="assign-table">
           <thead>
             <tr>
               <th class="col-check">
-                <input type="checkbox" [checked]="allRowsChecked" (change)="onAllRowChecked($event)" />
+                <input type="checkbox" [checked]="allDisplayRowsChecked" (change)="onAllDisplayRowChecked($event)" />
               </th>
               <th class="col-wc">加工中心</th>
               <th class="col-count">加工数</th>
               <th class="col-qa">质检</th>
               <th class="col-wcname">工作中心</th>
-              <th class="col-dispatch">预制派工单号</th>
+              <th class="col-predispatch">预制派工单号</th>
+              <th class="col-dispatch">工单号</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of rows">
+            <tr *ngFor="let row of displayRows">
               <td class="col-check">
-                <input type="checkbox" [(ngModel)]="row.checked" />
+                <input type="checkbox" [(ngModel)]="row.checked" (ngModelChange)="onDisplayRowChecked(row.id)" />
               </td>
               <td class="col-wc">
                 <nz-select
@@ -102,7 +103,7 @@
                   [nzOptions]="workCenterOptions"
                   style="width:100%"
                   placeholder="请选择加工中心"
-                  (ngModelChange)="onWorkCenterChange(row)"
+                  (ngModelChange)="onDisplayWorkCenterChange(row)"
                 ></nz-select>
               </td>
               <td class="col-count">
@@ -111,8 +112,9 @@
               <td class="col-qa" align="center">
                 <input type="checkbox" [(ngModel)]="row.qualityCheck" />
               </td>
-              <td class="col-wcname">{{ row.workCenterName }}</td>
-              <td class="col-dispatch"><span class="dispatch-no" [title]="row.dispatchNo">{{ row.dispatchNo }}</span></td>
+              <td class="col-wcname">{{ row.workCenterLabel }}</td>
+              <td class="col-predispatch"><span class="predispatch-no">{{ row.dispatchNo }}</span></td>
+              <td class="col-dispatch"><span class="dispatch-no" [title]="row.workOrderNo">{{ row.workOrderNo }}</span></td>
             </tr>
           </tbody>
         </table>
@@ -184,7 +186,7 @@
 <!-- 备选工单池抽屉 -->
 <nz-drawer
   [nzVisible]="backupDrawerVisible"
-  [nzTitle]="selectedDispatchFilter ? ('备选加工单 - ' + selectedDispatchFilter) : '备选加工单 - 全部预派工单'"
+  [nzTitle]="backupDrawerTitle"
   nzWidth="1100"
   [nzClosable]="true"
   [nzBodyStyle]="{ padding: '0', background: '#fff' }"

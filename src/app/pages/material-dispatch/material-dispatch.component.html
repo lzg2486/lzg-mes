@@ -141,8 +141,11 @@
 <div class="page-footer">
   <div class="footer-left">
     <ng-container *ngIf="actionButton; else noAction">
-      <button nz-button nzType="primary" size="small" (click)="handleAction()">
+      <button nz-button nzType="primary" size="small" [nzLoading]="generateLoading" (click)="handleAction()">
         {{ actionButton }}
+      </button>
+      <button *ngIf="showRecallButton" nz-button nzType="default" nzDanger size="small" (click)="handleRecall()">
+        撤回
       </button>
     </ng-container>
     <ng-template #noAction>
@@ -279,11 +282,11 @@
             <td>{{ row.wbs || '-' }}</td>
             <td>{{ row.processNo }}</td>
             <td>
-              <span *ngIf="partOrderItem?.status === 'dispatched'; else dashDispatch">{{ row.dispatchOrderNo }}</span>
-              <ng-template #dashDispatch><span style="color:#ccc;">-</span></ng-template>
+              <span *ngIf="partOrderItem?.status === 'dispatched'; else dashDispatchNo">{{ row.dispatchOrderNo }}</span>
+              <ng-template #dashDispatchNo><span style="color:#ccc;">-</span></ng-template>
             </td>
             <td>
-              <span *ngIf="partOrderItem?.status === 'dispatched'; else dashWork">{{ row.workOrderNo }}</span>
+              <span *ngIf="partOrderItem?.status === 'dispatched' || partOrderItem?.status === 'pending_dispatch'; else dashWork">{{ row.workOrderNo }}</span>
               <ng-template #dashWork><span style="color:#ccc;">-</span></ng-template>
             </td>
             <td align="right">{{ row.quantity | number:'1.3-3' }}</td>

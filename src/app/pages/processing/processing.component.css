@@ -320,3 +320,11 @@
   max-height: 280px;
   overflow-y: auto;
 }
+
+/* 关键件绑定底部按钮 */
+.bind-footer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 0 8px;
+}

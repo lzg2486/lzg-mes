@@ -42,6 +42,7 @@ interface ScanWorkOrderItem {
   quantity: number;
   started: boolean;
   orderNo: string;       // 生产订单号
+  dispatchNo: string;    // 预制派工单号
 }
 
 interface BindPartItem {
@@ -150,11 +151,11 @@ export class ProcessingComponent implements OnDestroy {
     this.scanMaterialItems = [];
     this.scanWorkOrderItems = [];
 
-    // 模拟扫描：2.5 秒后扫到派工单号并显示结果
+    // 模拟扫描：2.5 秒后扫到预制派工单号并显示结果（格式与约料管理一致：2000YPG...）
     this.scanTimer = setTimeout(() => {
-      // 取第一条约料数据作为扫描目标
+      // 取第一条约料数据作为扫描目标，使用预制派工单号格式
       const target = this.listOfData.find(d => d.isMaterialReserved) || this.listOfData[0];
-      this.scannedDispatchNo = target.dispatchNo;
+      this.scannedDispatchNo = '2000YPG26041300001';
       this.scanMaterialItems = this.getMockScanMaterials(target);
       this.scanWorkOrderItems = this.getMockScanWorkOrders(target);
       this.scanStage = 'result';
@@ -162,39 +163,40 @@ export class ProcessingComponent implements OnDestroy {
   }
 
   private getMockScanMaterials(_item: ProcessingRecord): ScanMaterialItem[] {
-    // 模拟3个生产订单的物料清单，共10条
+    // 模拟3个生产订单的物料清单，共10条（订单号/工序与约料管理保持一致）
     return [
-      // -- 订单 PO202606001，工序 0030 --
-      { materialCode: '361080131201', materialName: '平垫圈Φ20.1×Φ32×3Fe/Ct.obk', quantity: 5, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0030' },
-      { materialCode: '361080131202', materialName: '平垫圈Φ20.2×Φ33×3Fe/Ct.obk', quantity: 6, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0030' },
-      { materialCode: '32G021613006', materialName: 'O形橡胶密封圈_6.75×1.78_72NBR872', quantity: 2, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0030' },
-      { materialCode: '3BCH51200100', materialName: '螺柱 M8×25', quantity: 4, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0030' },
-      // -- 订单 PO202606001，工序 0040 --
-      { materialCode: '361080131203', materialName: '平垫圈Φ20.3×Φ34×3Fe/Ct.obk', quantity: 3, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0040' },
-      { materialCode: '3BCH51080030', materialName: '内六角圆柱头螺钉M8×25', quantity: 8, unit: 'EA', received: true, orderNo: 'PO202606001', processCode: '0040' },
-      // -- 订单 PO202606002，工序 0020 --
-      { materialCode: '3BCH42030010', materialName: '内六角平端紧定螺钉M6×10', quantity: 12, unit: 'EA', received: true, orderNo: 'PO202606002', processCode: '0020' },
-      { materialCode: '4BCH12011005', materialName: '六角螺母 M10', quantity: 10, unit: 'EA', received: true, orderNo: 'PO202606002', processCode: '0020' },
-      // -- 订单 PO202606003，工序 0050 --
-      { materialCode: '5BCH33010020', materialName: '弹簧垫圈Φ10', quantity: 8, unit: 'EA', received: true, orderNo: 'PO202606003', processCode: '0050' },
-      { materialCode: '5BCH33010022', materialName: '弹簧垫圈Φ12', quantity: 6, unit: 'EA', received: true, orderNo: 'PO202606003', processCode: '0050' },
+      // -- 订单 20260613001，工序 0030 --
+      { materialCode: '361080131201', materialName: '平垫圈Φ20.1×Φ32×3Fe/Ct.obk', quantity: 5, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0030' },
+      { materialCode: '361080131202', materialName: '平垫圈Φ20.2×Φ33×3Fe/Ct.obk', quantity: 6, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0030' },
+      { materialCode: '32G021613006', materialName: 'O形橡胶密封圈_6.75×1.78_72NBR872', quantity: 2, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0030' },
+      { materialCode: '3BCH51200100', materialName: '螺柱 M8×25', quantity: 4, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0030' },
+      // -- 订单 20260613001，工序 0040 --
+      { materialCode: '361080131203', materialName: '平垫圈Φ20.3×Φ34×3Fe/Ct.obk', quantity: 3, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0040' },
+      { materialCode: '3BCH51080030', materialName: '内六角圆柱头螺钉M8×25', quantity: 8, unit: 'EA', received: true, orderNo: '20260613001', processCode: '0040' },
+      // -- 订单 20260613002，工序 0020 --
+      { materialCode: '3BCH42030010', materialName: '内六角平端紧定螺钉M6×10', quantity: 12, unit: 'EA', received: true, orderNo: '20260613002', processCode: '0020' },
+      { materialCode: '4BCH12011005', materialName: '六角螺母 M10', quantity: 10, unit: 'EA', received: true, orderNo: '20260613002', processCode: '0020' },
+      // -- 订单 20260613003，工序 0050 --
+      { materialCode: '5BCH33010020', materialName: '弹簧垫圈Φ10', quantity: 8, unit: 'EA', received: true, orderNo: '20260613003', processCode: '0050' },
+      { materialCode: '5BCH33010022', materialName: '弹簧垫圈Φ12', quantity: 6, unit: 'EA', received: true, orderNo: '20260613003', processCode: '0050' },
     ];
   }
 
   private getMockScanWorkOrders(_item: ProcessingRecord): ScanWorkOrderItem[] {
-    // 模拟3个生产订单的工单清单，共8条
+    // 模拟3个生产订单的工单清单，共8条（订单号/工单编号与约料管理保持一致）
+    // 注意：派工单号(数字编号) 与 预制派工单号(2000YPG...) 是不同的概念
     return [
-      // -- 订单 PO202606001：法兰轴 三个工序 --
-      { workNo: '0000001985', processCode: '0030', materialDesc: '法兰轴', workCenter: 'X2D05', quantity: 10, started: true, orderNo: 'PO202606001' },
-      { workNo: '0000001986', processCode: '0040', materialDesc: '法兰轴', workCenter: 'X2D02', quantity: 10, started: true, orderNo: 'PO202606001' },
-      { workNo: '0000001988', processCode: '0070', materialDesc: '法兰轴', workCenter: 'X2D01', quantity: 10, started: true, orderNo: 'PO202606001' },
-      // -- 订单 PO202606002：法兰轴 两个工序 --
-      { workNo: '0000001968', processCode: '0020', materialDesc: '法兰轴', workCenter: 'D6', quantity: 3, started: true, orderNo: 'PO202606002' },
-      { workNo: '0000001972', processCode: '0060', materialDesc: '法兰轴', workCenter: 'D4', quantity: 3, started: true, orderNo: 'PO202606002' },
-      // -- 订单 PO202606003：内框纸输送轮装置 三个工序 --
-      { workNo: '0000001949', processCode: '9002', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: 'PO202606003' },
-      { workNo: '0000001948', processCode: '9001', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: 'PO202606003' },
-      { workNo: '0000001947', processCode: '0010', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: 'PO202606003' },
+      // -- 订单 20260613001：法兰轴 三个工序 --
+      { workNo: '0000001985', processCode: '0030', materialDesc: '法兰轴', workCenter: 'X2D05', quantity: 10, started: true, orderNo: '20260613001', dispatchNo: '0000001898' },
+      { workNo: '0000001986', processCode: '0040', materialDesc: '法兰轴', workCenter: 'X2D02', quantity: 10, started: true, orderNo: '20260613001', dispatchNo: '0000001898' },
+      { workNo: '0000001988', processCode: '0070', materialDesc: '法兰轴', workCenter: 'X2D01', quantity: 10, started: true, orderNo: '20260613001', dispatchNo: '0000001898' },
+      // -- 订单 20260613002：法兰轴 两个工序 --
+      { workNo: '0000001968', processCode: '0020', materialDesc: '法兰轴', workCenter: 'D6', quantity: 3, started: true, orderNo: '20260613002', dispatchNo: '0000001896' },
+      { workNo: '0000001972', processCode: '0060', materialDesc: '法兰轴', workCenter: 'D4', quantity: 3, started: true, orderNo: '20260613002', dispatchNo: '0000001896' },
+      // -- 订单 20260613003：内框纸输送轮装置 三个工序 --
+      { workNo: '0000001949', processCode: '9002', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: '20260613003', dispatchNo: '0000001891' },
+      { workNo: '0000001948', processCode: '9001', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: '20260613003', dispatchNo: '0000001891' },
+      { workNo: '0000001947', processCode: '0010', materialDesc: '内框纸输送轮装置', workCenter: 'ZB', quantity: 1, started: true, orderNo: '20260613003', dispatchNo: '0000001891' },
     ];
   }
 

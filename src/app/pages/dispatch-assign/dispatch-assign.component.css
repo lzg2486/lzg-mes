@@ -202,8 +202,10 @@
 .col-qa { width: 46px; text-align: center; }
 .col-wcname { width: 140px; }
 .col-dispatch { /* 剩余空间 */ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.col-predispatch { width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .dispatch-no { color: #cf1322; font-weight: 600; font-family: 'Courier New', monospace; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.predispatch-no { color: #cf1322; font-family: 'Courier New', monospace; font-size: 12.5px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .table-actions {
   display: flex;

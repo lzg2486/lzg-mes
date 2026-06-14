@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-// 派工单行数据
+// 派工单行数据（父级行：预制派工单级别）
 export interface DispatchAssignRow {
   id: number;
   checked: boolean;
@@ -15,6 +15,25 @@ export interface DispatchAssignRow {
   partCode: string;
   processNo: string;         // 工序号
   wbs: string;               // WBS
+}
+
+// 展示行（工单明细级别，由父级展开）
+export interface WorkOrderDisplayRow {
+  id: number;
+  parentId: number;          // 关联的父级行 id
+  checked: boolean;
+  dispatchNo: string;        // 预制派工单号
+  workCenterId: string | null;
+  workCenterName: string;
+  workCenterLabel: string;
+  productionCount: number;
+  qualityCheck: boolean;
+  workOrderNo: string;       // 工单号
+  orderNo: string;
+  partCode: string;
+  wbs: string;
+  processNo: string;
+  quantity: number;
 }
 
 // 人员数据
@@ -52,9 +71,10 @@ export class DispatchAssignComponent {
   selectedDispatchFilter: string | null = null;
 
   // 计算每个已勾选预派工单的明细数量（按工单明细去重后计数）
-  get dispatchOrderItems(): { dispatchNo: string; count: number }[] {
+  get dispatchOrderItems(): { dispatchNo: string; deptName: string; count: number }[] {
     return this.rows.filter(r => r.checked).map(r => ({
       dispatchNo: r.dispatchNo,
+      deptName: '总装制造中心（西）',
       count: this._getDedupedDetailRows(r).length,
     }));
   }
@@ -64,10 +84,111 @@ export class DispatchAssignComponent {
     return this.dispatchOrderItems.reduce((sum, item) => sum + item.count, 0);
   }
 
+  // 当前筛选下的展示行数（与备选池 currentFilteredCount 对齐）
+  get filteredDisplayCount(): number {
+    if (!this.selectedDispatchFilter) return this._displayRows.length;
+    return this._displayRows.filter(r => r.dispatchNo === this.selectedDispatchFilter).length;
+  }
+
   // 当前备选池中的实际条数
   get currentFilteredCount(): number {
     if (!this.selectedDispatchFilter) return this.backupRows.length;
     return this.backupRows.filter(r => r.dispatchNo === this.selectedDispatchFilter).length;
+  }
+
+  /** 备选抽屉标题（含部门） */
+  get backupDrawerTitle(): string {
+    if (this.selectedDispatchFilter) {
+      const item = this.rows.find(r => r.dispatchNo === this.selectedDispatchFilter);
+      return `备选加工单 - ${this.selectedDispatchFilter} 总装制造中心（西）`;
+    }
+    return '备选加工单 - 全部预派工单';
+  }
+
+  /** 展示行缓存：将已勾选父级行展开为工单明细行 */
+  private _displayRows: WorkOrderDisplayRow[] = [];
+
+  get displayRows(): WorkOrderDisplayRow[] {
+    return this._displayRows;
+  }
+
+  /**
+   * 重建展示行（当 rows 或 selectedDispatchFilter 变化时调用）
+   * 保留已有行的 checked 和 workCenter 状态
+   */
+  private _rebuildDisplayRows(): void {
+    const oldMap = new Map<number, WorkOrderDisplayRow>();
+    for (const old of this._displayRows) {
+      oldMap.set(old.id, old);
+    }
+
+    const result: WorkOrderDisplayRow[] = [];
+    let idCounter = Date.now();
+    let workOrderSeq = 0;
+
+    let parentItems = this.rows.filter(r => r.checked);
+    if (this.selectedDispatchFilter) {
+      parentItems = parentItems.filter(r => r.dispatchNo === this.selectedDispatchFilter);
+    }
+
+    for (const item of parentItems) {
+      const deduped = this._getDedupedDetailRows(item);
+      for (let i = 0; i < deduped.length; i++) {
+        const d = deduped[i];
+        const newId = ++idCounter;
+        // 尝试复用旧行的用户编辑状态
+        const oldRow = [...oldMap.values()].find(old =>
+          old.parentId === item.id &&
+          old.orderNo === d.orderNo &&
+          old.partCode === d.partCode &&
+          old.wbs === d.wbs &&
+          old.processNo === d.processNo
+        );
+        result.push({
+          id: newId,
+          parentId: item.id,
+          checked: oldRow ? oldRow.checked : true,
+          dispatchNo: item.dispatchNo,
+          workCenterId: oldRow ? oldRow.workCenterId : item.workCenterId,
+          workCenterName: oldRow ? oldRow.workCenterName : item.workCenterName,
+          workCenterLabel: oldRow ? oldRow.workCenterLabel : (item.workCenterLabel || '-'),
+          productionCount: oldRow ? oldRow.productionCount : item.productionCount,
+          qualityCheck: oldRow ? oldRow.qualityCheck : item.qualityCheck,
+          workOrderNo: `20000130${String(750 + ++workOrderSeq).padStart(3, '0')}`,
+          orderNo: d.orderNo,
+          partCode: d.partCode,
+          wbs: d.wbs,
+          processNo: d.processNo,
+          quantity: d.quantity,
+        });
+      }
+    }
+    this._displayRows = result;
+  }
+
+  get allDisplayRowsChecked(): boolean {
+    const list = this._displayRows;
+    return list.length > 0 && list.every(r => r.checked);
+  }
+
+  onAllDisplayRowChecked(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    for (const row of this._displayRows) {
+      row.checked = checked;
+    }
+    this._syncParentCheckFromDisplay();
+  }
+
+  onDisplayRowChecked(_rowId: number): void {
+    this._syncParentCheckFromDisplay();
+  }
+
+  /** 根据展示行勾选状态同步父级行 */
+  private _syncParentCheckFromDisplay(): void {
+    for (const parent of this.rows) {
+      const children = this._displayRows.filter(r => r.parentId === parent.id);
+      parent.checked = children.length > 0 && children.every(c => c.checked);
+    }
   }
 
   // ---- 左侧：人员选择 ----
@@ -159,37 +280,48 @@ export class DispatchAssignComponent {
         { id: 9, checked: true, workCenterId: 'D6', workCenterName: 'D6-总装工位', workCenterLabel: 'D6-总装工位', productionCount: 3, qualityCheck: false, dispatchNo: '2000YPG26012600004', partCode: '21BBH5700002', processNo: '0030', wbs: '20400' },
       ];
     }
-  }
-
-  get allRowsChecked(): boolean {
-    return this.rows.length > 0 && this.rows.every(r => r.checked);
-  }
-
-  onAllRowChecked(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.rows.forEach(r => r.checked = checked);
+    this._rebuildDisplayRows();
   }
 
   autoFill(): void {
     const target = this.totalWorkCenter;
     if (!target) return;
     const wc = this.workCenterOptions.find(w => w.value === target);
-    this.rows.forEach(r => {
-      r.workCenterId = target;
-      r.workCenterName = wc?.label || '';
-      r.workCenterLabel = wc?.label || '';
-    });
+    for (const item of this.rows) {
+      if (item.checked) {
+        item.workCenterId = target;
+        item.workCenterName = wc?.label || '';
+        item.workCenterLabel = wc?.label || '';
+      }
+    }
   }
 
   clearWorkCenters(): void {
-    this.rows.forEach(r => { r.workCenterId = null; r.workCenterName = ''; r.workCenterLabel = ''; });
+    for (const item of this.rows) {
+      if (item.checked) { item.workCenterId = null; item.workCenterName = ''; item.workCenterLabel = ''; }
+    }
   }
 
-  onWorkCenterChange(row: DispatchAssignRow): void {
-    const wc = this.workCenterOptions.find(w => w.value === row.workCenterId);
+  /** 面包屑筛选切换（重建展示行） */
+  selectFilter(val: string | null): void {
+    this.selectedDispatchFilter = val;
+    this._rebuildDisplayRows();
+  }
+
+  /** 展示行修改加工中心时，同步到同父级行的所有子行 */
+  onDisplayWorkCenterChange(displayRow: WorkOrderDisplayRow): void {
+    const parent = this.rows.find(r => r.id === displayRow.parentId);
+    if (!parent) return;
+    parent.workCenterId = displayRow.workCenterId;
+    parent.workCenterName = displayRow.workCenterName;
+    // 同步到同级所有展示行
+    const wc = this.workCenterOptions.find(w => w.value === displayRow.workCenterId);
     const label = wc?.label || '';
-    row.workCenterName = label;
-    row.workCenterLabel = label;
+    for (const dr of this._displayRows.filter(r => r.parentId === displayRow.parentId)) {
+      dr.workCenterId = displayRow.workCenterId;
+      dr.workCenterName = label;
+      dr.workCenterLabel = label;
+    }
   }
 
   // ---- 底部操作栏 ----
