@@ -1,0 +1,67 @@
+/* 引入 ng-zorro 全局样式 */
+@import 'ng-zorro-antd/ng-zorro-antd.min.css';
+
+/* 全局重置 */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 侧边栏 Logo 区域 */
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 16px 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.logo-area .logo-icon {
+  width: 32px;
+  height: 32px;
+  background: #1890ff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+}
+
+/* 内容区 - flex 列布局，撑满视口 */
+.content-wrapper {
+  padding: 16px 24px;
+  background: #f5f7fa;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 搜索栏 - 白色卡片 */
+.search-bar {
+  background: #fff;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+/* 表格卡片容器 */
+.table-card {
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* 操作按钮栏 */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.action-left { display: flex; gap: 8px; }
+.action-right { display: flex; gap: 8px; }

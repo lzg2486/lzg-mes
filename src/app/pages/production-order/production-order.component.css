@@ -1,0 +1,12 @@
+/*
+ * 固定列背景色 — ant-design 功能性必需
+ * position: sticky 固定列必须有不透明背景才能遮挡滚动穿透的内容。
+ */
+:host ::ng-deep .ant-table-cell-fix-left,
+:host ::ng-deep .ant-table-cell-fix-right {
+  background: #fff;
+}
+:host ::ng-deep .ant-table-thead .ant-table-cell-fix-left,
+:host ::ng-deep .ant-table-thead .ant-table-cell-fix-right {
+  background: #fafafa;
+}

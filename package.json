@@ -1,26 +1,29 @@
 {
-  "name": "lzg-mes",
-  "version": "0.0.1",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "node scripts/download-docs.js && vite",
-    "download-docs": "node scripts/download-docs.js",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
-  },
-  "dependencies": {
-    "element-plus": "^2.8.8",
-    "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.7.4",
-    "@vitejs/plugin-vue": "^5.1.2",
-    "typescript": "^5.6.2",
-    "vite": "^5.4.8",
-    "vue-tsc": "^2.1.6"
-  }
+    "name": "mes2-system",
+    "version": "1.0.0",
+    "scripts": {
+        "ng": "ng",
+        "start": "ng serve --host 0.0.0.0 --port 4200",
+        "build": "ng build"
+    },
+    "dependencies": {
+        "@angular/animations": "^17.3.0",
+        "@angular/common": "^17.3.0",
+        "@angular/compiler": "^17.3.0",
+        "@angular/core": "^17.3.0",
+        "@angular/forms": "^17.3.0",
+        "@angular/platform-browser": "^17.3.0",
+        "@angular/platform-browser-dynamic": "^17.3.0",
+        "@angular/router": "^17.3.0",
+        "ng-zorro-antd": "^17.3.0",
+        "rxjs": "~7.8.0",
+        "tslib": "^2.6.0",
+        "zone.js": "~0.14.0"
+    },
+    "devDependencies": {
+        "@angular-devkit/build-angular": "^17.3.0",
+        "@angular/cli": "^17.3.0",
+        "@angular/compiler-cli": "^17.3.0",
+        "typescript": "~5.4.0"
+    }
 }
-

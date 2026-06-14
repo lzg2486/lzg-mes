@@ -1,0 +1,105 @@
+<!-- 顶部Tab切换 -->
+<div style="margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+  <nz-button-group>
+    <button nz-button nzType="primary">
+      <i class="anticon anticon-appstore"></i> 布局
+    </button>
+  </nz-button-group>
+
+  <!-- 面包屑 -->
+  <nz-breadcrumb [nzSeparator]="'>'">
+    <nz-breadcrumb-item>生产派工</nz-breadcrumb-item>
+    <nz-breadcrumb-item>工单生成</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <div style="flex:1;"></div>
+
+  <!-- 视图切换 Tab -->
+  <nz-radio-group [(ngModel)]="activeView" nzButtonStyle="solid" style="margin-right:12px;">
+    <label nzRadioButton value="order">订单视图</label>
+    <label nzRadioButton value="process">工序视图</label>
+  </nz-radio-group>
+
+  <i class="anticon anticon-down-circle-o" style="font-size:18px;color:#999;cursor:pointer;"></i>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
+    <span>生产订单：</span>
+    <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
+    <span style="margin-left:8px;">物料号：</span>
+    <input nz-input placeholder="物料号（批量、模糊）" [(ngModel)]="searchMaterialNo" style="width:220px;" />
+    <button nz-button nzType="primary"><i class="anticon anticon-search"></i></button>
+  </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+  <nz-table #workTable [nzData]="listOfData"
+    nzSize="small"
+    [nzFrontPagination]="true"
+    [nzPageSize]="50"
+    [nzShowSizeChanger]="true"
+    [nzShowQuickJumper]="true"
+    [nzTotal]="144"
+    [nzBordered]="false">
+
+    <thead>
+      <tr>
+        <th width="50">
+          <label nz-checkbox [(ngModel)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (ngModelChange)="onAllChecked($event)"></label>
+        </th>
+        <th width="60">序号</th>
+        <th><a href="#">生产工单号 <i class="anticon anticon-arrow-down"></i></a></th>
+        <th><a href="#">物料号 <i class="anticon anticon-arrow-up"></i></a></th>
+        <th>图号</th>
+        <th>物料描述</th>
+        <th width="70">数量</th>
+        <th>计划员</th>
+        <th>调度员</th>
+        <th>生产工厂</th>
+        <th>WBS元素</th>
+        <th width="50"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of workTable.data; let i = index">
+        <td>
+          <label nz-checkbox [(ngModel)]="data.checked"
+            (ngModelChange)="onItemChecked(data.id, $event)"></label>
+        </td>
+        <td>{{ i + 1 }}</td>
+        <td><a style="color:#1890ff;">{{ data.workNo }}</a></td>
+        <td>{{ data.materialNo }}</td>
+        <td>{{ data.drawingNo || '-' }}</td>
+        <td>{{ data.materialDesc }}</td>
+        <td>{{ data.quantity }}</td>
+        <td>{{ data.planner }}</td>
+        <td>{{ data.dispatcher || '-' }}</td>
+        <td>{{ data.factory }}</td>
+        <td><span *ngIf="data.wbsElement">{{ data.wbsElement }}</span></td>
+        <td>
+          <label nz-switch [(ngModel)]="data.switchOn"></label>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <!-- 底部操作栏 -->
+  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;">
+    <div>
+      <i class="anticon anticon-double-left"></i> 工序列表 &nbsp;
+      <i class="anticon anticon-double-right"></i> 工序列表
+    </div>
+    <div>共 144 条</div>
+  </div>
+</div>
+
+<!-- 头像 -->
+<div style="position:fixed;bottom:20px;right:40px;">
+  <nz-avatar nzText="A" style="background-color:#1890ff;width:36px;height:36px;line-height:36px;font-size:16px;"></nz-avatar>
+</div>

@@ -1,0 +1,103 @@
+<!-- 顶部 -->
+<div style="margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+  <nz-button-group>
+    <button nz-button nzType="primary">
+      <i class="anticon anticon-appstore"></i> 布局
+    </button>
+  </nz-button-group>
+
+  <!-- 操作模式切换 -->
+  <nz-radio-group [(ngModel)]="viewMode" nzButtonStyle="solid" style="margin-left:8px;">
+    <label nz-radio-button nzValue="card"><i class="anticon anticon-table"></i> 卡片视图</label>
+    <label nz-radio-button nzValue="pull"><i class="anticon anticon-rocket"></i> 拉动式</label>
+    <label nz-radio-button nzValue="process"><span style="font-weight:600;">生产加工</span></label>
+  </nz-radio-group>
+
+  <div style="flex:1;"></div>
+  <i class="anticon anticon-down-circle-o" style="font-size:18px;color:#999;cursor:pointer;"></i>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
+    <span>生产订单：</span>
+    <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
+    <span style="margin-left:8px;">物料号：</span>
+    <input nz-input placeholder="物料号" [(ngModel)]="searchMaterialNo" style="width:180px;" />
+    <button nz-button nzType="primary"><i class="anticon anticon-search"></i></button>
+  </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+  <nz-table #procTable [nzData]="listOfData"
+    nzSize="small"
+    [nzFrontPagination]="true"
+    [nzPageSize]="50"
+    [nzShowSizeChanger]="true"
+    [nzShowQuickJumper]="true"
+    [nzTotal]="52"
+    [nzBordered]="false">
+
+    <thead>
+      <tr>
+        <th width="50">
+          <label nz-checkbox [(ngModel)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (ngModelChange)="onAllChecked($event)"></label>
+        </th>
+        <th width="60">序号</th>
+        <th><a href="#">派工单编号 <sup style="color:#ff4d4f;">7</sup> <i class="anticon anticon-arrow-down"></i></a></th>
+        <th><a href="#">工单编号 <i class="anticon anticon-arrow-down"></i></a></th>
+        <th>工序</th>
+        <th width="120">实动定额百分比</th>
+        <th>物料描述</th>
+        <th width="80"><a href="#">顺序编号 <i class="anticon anticon-arrow-down"></i></a></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of procTable.data; let i = index">
+        <td>
+          <label nz-checkbox [(ngModel)]="data.checked"
+            (ngModelChange)="onItemChecked(data.id, $event)"></label>
+        </td>
+        <td>{{ i + 1 }}</td>
+        <td><a style="color:#1890ff;">{{ data.dispatchNo }}</a></td>
+        <td><a style="color:#1890ff;">{{ data.workNo }}</a></td>
+        <td>{{ data.processCode }}</td>
+        <td>
+          <div *ngIf="getProgressValue(data.actualPercent) > 0">
+            <nz-progress
+              [nzPercent]="getProgressValue(data.actualPercent)"
+              [nzStrokeWidth]="6"
+              [nzSize]="'small'"
+              [nzStatus]="'active'"
+              [nzShowInfo]="false">
+            </nz-progress>
+          </div>
+          <span *ngIf="getProgressValue(data.actualPercent) === 0">{{ data.actualPercent }}</span>
+        </td>
+        <td>{{ data.materialDesc }}</td>
+        <td>{{ data.seqNo }}</td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <!-- 底部操作栏 - 带操作按钮 -->
+  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;align-items:center;">
+    <div style="display:flex;gap:8px;">
+      <button nz-button nzType="primary"><i class="anticon anticon-play-circle-o"></i> 开工</button>
+      <button nz-button nzType="default"><i class="anticon anticon-pause-circle-o"></i> 暂停</button>
+      <button nz-button nzType="default"><i class="anticon anticon-clock-circle-o"></i> 等工</button>
+      <button nz-button nzType="default"><i class="anticon anticon-check-circle-o"></i> 完成</button>
+      <button nz-button nzType="default">更多 <i class="anticon anticon-down"></i></button>
+    </div>
+    <div>共 52 条</div>
+  </div>
+</div>
+
+<!-- 头像 -->
+<div style="position:fixed;bottom:20px;right:40px;">
+  <nz-avatar nzText="A" style="background-color:#1890ff;width:36px;height:36px;line-height:36px;font-size:16px;"></nz-avatar>
+</div>

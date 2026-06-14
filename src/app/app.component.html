@@ -1,0 +1,46 @@
+<nz-layout class="app-layout" style="min-height: 100vh;">
+
+  <!-- 侧边栏 -->
+  <nz-sider
+    [nzCollapsible]="true"
+    [(nzCollapsed)]="isCollapsed"
+    nzBreakpoint="lg"
+    [nzWidth]="200"
+    [nzCollapsedWidth]="64"
+    [nzTrigger]="null"
+    class="sider-dark"
+    style="background: #001529;"
+  >
+    <div class="logo-area">
+      <span class="logo-icon">M</span>
+      <ng-container *ngIf="!isCollapsed">
+        <div>MES系统</div>
+      </ng-container>
+    </div>
+
+    <ul nz-menu
+        nzTheme="dark"
+        nzMode="inline"
+        [nzInlineCollapsed]="isCollapsed"
+        style="border-right:none;">
+      <li *ngFor="let menu of menus"
+          nz-menu-item
+          (click)="onMenuClick(menu.route)"
+          [class.ant-menu-item-selected]="currentMenu === menu.label">
+        <span>{{ menu.label }}</span>
+      </li>
+    </ul>
+
+    <!-- 底部版本信息 -->
+    <div *ngIf="!isCollapsed" style="position:absolute;bottom:8px;left:16px;right:16px;color:#666;font-size:11px;text-align:center;">
+      MES v1.0
+    </div>
+  </nz-sider>
+
+  <!-- 右侧内容区 -->
+  <nz-layout>
+    <nz-content class="content-wrapper">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

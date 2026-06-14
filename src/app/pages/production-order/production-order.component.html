@@ -1,0 +1,101 @@
+<!-- 顶部Tab切换 -->
+<div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-shrink:0;">
+  <nz-button-group>
+    <button nz-button nzType="primary" (click)="activeTab='MES'" [nzType]="activeTab==='MES'?'primary':'default'">
+      <i class="anticon anticon-appstore"></i> 布局
+    </button>
+  </nz-button-group>
+
+  <!-- 面包屑 -->
+  <nz-breadcrumb [nzSeparator]="'>'" *ngIf="activeTab === 'MES'">
+    <nz-breadcrumb-item>生产派工</nz-breadcrumb-item>
+    <nz-breadcrumb-item>生产订单</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <div style="flex:1;"></div>
+
+  <nz-radio-group [(ngModel)]="activeTab" nzButtonStyle="solid">
+    <label nzRadioButton value="MES">MES</label>
+    <label nzRadioButton value="SAP-MES">SAP-MES</label>
+    <label nzRadioButton value="SAP">SAP</label>
+  </nz-radio-group>
+</div>
+
+<!-- 搜索栏 -->
+<div class="search-bar" style="flex-shrink:0;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
+    <span>生产订单：</span>
+    <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
+    <span style="margin-left:8px;">物料号：</span>
+    <input nz-input placeholder="物料号（批量、模糊）" [(ngModel)]="searchMaterialNo" style="width:220px;" />
+    <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
+  </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+  <nz-table #orderTable [nzData]="listOfData"
+    nzSize="small"
+    [nzFrontPagination]="true"
+    [nzPageSize]="50"
+    [nzShowSizeChanger]="true"
+    [nzShowQuickJumper]="true"
+    [nzTotal]="21"
+    [nzBordered]="false"
+    [nzScroll]="{ x: '1300px', y: 'calc(100vh - 280px)' }">
+
+    <thead>
+      <tr>
+        <th nzLeft nzWidth="60px" nzAlign="center">
+          <label nz-checkbox [(ngModel)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (ngModelChange)="onAllChecked($event)"></label>
+        </th>
+        <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
+        <th nzLeft nzWidth="140px">生产订单号 <i class="anticon anticon-arrow-down"></i></th>
+        <th nzWidth="150px">物料号 <i class="anticon anticon-arrow-up"></i></th>
+        <th nzWidth="120px">图号</th>
+        <th nzWidth="180px">物料描述</th>
+        <th nzWidth="80px">质检标志</th>
+        <th nzWidth="120px">检验批</th>
+        <th nzWidth="60px" nzAlign="center">数量</th>
+        <th nzWidth="70px">计划员</th>
+        <th nzWidth="80px">调度员</th>
+        <th nzWidth="80px">生产工厂</th>
+        <th nzWidth="80px">订单类型</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of orderTable.data; let i = index">
+        <td nzLeft nzAlign="center">
+          <label nz-checkbox [(ngModel)]="data.checked"
+            (ngModelChange)="onItemChecked(data.id, $event)"></label>
+        </td>
+        <td nzLeft nzAlign="center">{{ i + 1 }}</td>
+        <td nzLeft><a style="color:#1890ff;">{{ data.orderNo }}</a></td>
+        <td>{{ data.materialNo }}</td>
+        <td>{{ data.drawingNo || '' }}</td>
+        <td>{{ data.materialDesc }}</td>
+        <td nzAlign="center">{{ data.qcFlag }}</td>
+        <td>{{ data.inspectBatch || '-' }}</td>
+        <td nzAlign="center">{{ data.quantity }}</td>
+        <td nzAlign="center">{{ data.planner }}</td>
+        <td nzAlign="center">{{ data.dispatcher || '-' }}</td>
+        <td nzAlign="center">{{ data.factory }}</td>
+        <td>{{ data.orderType }}</td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+  <!-- 底部操作栏 -->
+  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;">
+    <div>
+      <i class="anticon anticon-download"></i> 下发 &nbsp;
+      <i class="anticon anticon-pushpin"></i> 挂起 &nbsp;
+      <i class="anticon anticon-check-circle"></i> 完成 &nbsp;
+      <i class="anticon anticon-safety"></i> 可用性管理
+    </div>
+    <div>共 21 条</div>
+  </div>
+</div>
