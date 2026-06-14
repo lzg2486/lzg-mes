@@ -1,1 +1,44 @@
-/* 工时审核 - 全部使用 ng-zorro 组件自带样式，无需自定义 */
+/* 撑满父容器 */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 表格撑满剩余空间 */
+:host ::ng-deep .ant-table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+:host ::ng-deep .ant-table {
+  flex: 1;
+  min-height: 0;
+}
+
+/* 底部操作+分页栏 */
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+  background: #f5f7fa;
+  border-top: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+.footer-left { display: flex; gap: 8px; }
+.footer-right { font-size: 13px; color: #666; display: flex; align-items: center; }
+:host ::ng-deep .page-footer .ant-pagination { margin-left: 12px; }
+
+/* 固定列背景色 */
+:host ::ng-deep .ant-table-cell-fix-left,
+:host ::ng-deep .ant-table-cell-fix-right {
+  background: #fff;
+}
+:host ::ng-deep .ant-table-thead .ant-table-cell-fix-left,
+:host ::ng-deep .ant-table-thead .ant-table-cell-fix-right {
+  background: #fafafa;
+}

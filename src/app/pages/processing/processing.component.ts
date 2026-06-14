@@ -17,14 +17,10 @@ interface ProcessingRecord {
   styleUrls: ['./processing.component.css']
 })
 export class ProcessingComponent {
-  // 视图模式
   viewMode = 'process';
-
-  // 搜索条件
   searchOrderNo = '';
   searchMaterialNo = '';
 
-  // 表格数据
   listOfData: ProcessingRecord[] = [
     { id: 1, dispatchNo: '0000001898', workNo: '0000001985', processCode: '0030', actualPercent: '0%', materialDesc: '法兰轴', seqNo: 0 },
     { id: 2, dispatchNo: '0000001896', workNo: '0000001986', processCode: '0040', actualPercent: '1%', materialDesc: '法兰轴', seqNo: 0 },
@@ -42,7 +38,6 @@ export class ProcessingComponent {
     { id: 14, dispatchNo: '0000001852', workNo: '0000001640', processCode: '0010', actualPercent: '0.00%', materialDesc: '端面热封夹装部件', seqNo: 0 }
   ];
 
-  selectedData: Set<number> = new Set();
   checked = false;
   indeterminate = false;
 
@@ -51,17 +46,12 @@ export class ProcessingComponent {
     this.refreshCheckedStatus();
   }
 
-  onItemChecked(id: number, checked: boolean): void {
-    if (checked) {
-      this.selectedData.add(id);
-    } else {
-      this.selectedData.delete(id);
-    }
+  onItemChecked(_id: number, _checked: boolean): void {
     this.refreshCheckedStatus();
   }
 
   refreshCheckedStatus(): void {
-    const allChecked = this.listOfData.every(item => item.checked !== false && item.checked);
+    const allChecked = this.listOfData.every(item => item.checked);
     const someChecked = this.listOfData.some(item => item.checked);
     this.checked = allChecked;
     this.indeterminate = !allChecked && someChecked;

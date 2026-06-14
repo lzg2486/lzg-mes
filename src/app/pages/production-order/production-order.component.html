@@ -37,12 +37,8 @@
 <div class="table-card">
   <nz-table #orderTable [nzData]="listOfData"
     nzSize="small"
-    [nzFrontPagination]="true"
-    [nzPageSize]="50"
-    [nzShowSizeChanger]="true"
-    [nzShowQuickJumper]="true"
-    [nzTotal]="21"
     [nzBordered]="false"
+    [nzShowPagination]="false"
     [nzScroll]="{ x: '1300px', y: 'calc(100vh - 280px)' }">
 
     <thead>
@@ -75,7 +71,7 @@
         <td nzLeft nzAlign="center">{{ i + 1 }}</td>
         <td nzLeft><a style="color:#1890ff;">{{ data.orderNo }}</a></td>
         <td>{{ data.materialNo }}</td>
-        <td>{{ data.drawingNo || '' }}</td>
+        <td>{{ data.drawingNo }}</td>
         <td>{{ data.materialDesc }}</td>
         <td nzAlign="center">{{ data.qcFlag }}</td>
         <td>{{ data.inspectBatch || '-' }}</td>
@@ -87,15 +83,25 @@
       </tr>
     </tbody>
   </nz-table>
+</div>
 
-  <!-- 底部操作栏 -->
-  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;">
-    <div>
-      <i class="anticon anticon-download"></i> 下发 &nbsp;
-      <i class="anticon anticon-pushpin"></i> 挂起 &nbsp;
-      <i class="anticon anticon-check-circle"></i> 完成 &nbsp;
-      <i class="anticon anticon-safety"></i> 可用性管理
-    </div>
-    <div>共 21 条</div>
+<!-- 底部操作+分页栏 -->
+<div class="page-footer">
+  <div class="footer-left">
+    <button nz-button size="small"><i nz-icon nzType="download"></i> 下发</button>
+    <button nz-button size="small"><i nz-icon nzType="pushpin"></i> 挂起</button>
+    <button nz-button size="small"><i nz-icon nzType="check-circle"></i> 完成</button>
+    <button nz-button size="small"><i nz-icon nzType="safety-certificate"></i> 可用性管理</button>
+  </div>
+  <div class="footer-right">
+    共 25 项
+    <nz-pagination
+      [nzPageIndex]="1"
+      [nzTotal]="25"
+      [nzPageSize]="50"
+      nzSize="small"
+      [nzShowSizeChanger]="true"
+      [nzShowQuickJumper]="true">
+    </nz-pagination>
   </div>
 </div>

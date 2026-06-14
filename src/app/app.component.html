@@ -1,4 +1,4 @@
-<nz-layout class="app-layout" style="min-height: 100vh;">
+<nz-layout class="app-layout" style="height: 100vh;">
 
   <!-- 侧边栏 -->
   <nz-sider
@@ -7,9 +7,7 @@
     nzBreakpoint="lg"
     [nzWidth]="200"
     [nzCollapsedWidth]="64"
-    [nzTrigger]="null"
-    class="sider-dark"
-    style="background: #001529;"
+    nzReverseArrows="true"
   >
     <div class="logo-area">
       <span class="logo-icon">M</span>
@@ -38,8 +36,8 @@
   </nz-sider>
 
   <!-- 右侧内容区 -->
-  <nz-layout>
-    <nz-content class="content-wrapper">
+  <nz-layout style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+    <nz-content class="content-wrapper" style="flex: 1; min-height: 0; overflow: hidden;">
       <router-outlet></router-outlet>
     </nz-content>
   </nz-layout>

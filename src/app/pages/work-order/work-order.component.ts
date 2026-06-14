@@ -21,14 +21,10 @@ interface WorkOrder {
   styleUrls: ['./work-order.component.css']
 })
 export class WorkOrderComponent {
-  // Tab切换：订单视图 / 工序视图
   activeView = 'order';
-
-  // 搜索条件
   searchOrderNo = '';
   searchMaterialNo = '';
 
-  // 表格数据
   listOfData: WorkOrder[] = [
     { id: 1, workNo: '20000130423', materialNo: '21BAH2660000', drawingNo: '', materialDesc: '一号轮箱杆支座', quantity: 1, planner: 200, dispatcher: null, factory: 2000, wbsElement: 'Z-2000_20336ZJ02' },
     { id: 2, workNo: '20000130730', materialNo: '72BAH220001016', drawingNo: '', materialDesc: '第一推进器', quantity: 1, planner: 200, dispatcher: null, factory: 2000, wbsElement: 'Z-2000_20311ZJ01' },
@@ -48,7 +44,6 @@ export class WorkOrderComponent {
     { id: 16, workNo: '2500034187', materialNo: '3CBG33420900', drawingNo: '', materialDesc: '支架（智能制造）', quantity: 10, planner: 400, dispatcher: 300, factory: 2000, wbsElement: 'Z-2000_2014_001' }
   ];
 
-  selectedData: Set<number> = new Set();
   checked = false;
   indeterminate = false;
 
@@ -57,17 +52,12 @@ export class WorkOrderComponent {
     this.refreshCheckedStatus();
   }
 
-  onItemChecked(id: number, checked: boolean): void {
-    if (checked) {
-      this.selectedData.add(id);
-    } else {
-      this.selectedData.delete(id);
-    }
+  onItemChecked(_id: number, _checked: boolean): void {
     this.refreshCheckedStatus();
   }
 
   refreshCheckedStatus(): void {
-    const allChecked = this.listOfData.every(item => item.checked !== false && item.checked);
+    const allChecked = this.listOfData.every(item => item.checked);
     const someChecked = this.listOfData.some(item => item.checked);
     this.checked = allChecked;
     this.indeterminate = !allChecked && someChecked;

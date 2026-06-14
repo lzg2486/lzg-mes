@@ -1,5 +1,5 @@
 <!-- 顶部 -->
-<div style="margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+<div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-shrink:0;">
   <nz-button-group>
     <button nz-button nzType="primary">
       <i class="anticon anticon-appstore"></i> 布局
@@ -17,14 +17,14 @@
 </div>
 
 <!-- 搜索栏 -->
-<div class="search-bar">
+<div class="search-bar" style="flex-shrink:0;">
   <div style="display:flex;align-items:center;gap:12px;">
     <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
     <span>生产订单：</span>
     <input nz-input placeholder="生产订单（批量）" [(ngModel)]="searchOrderNo" style="width:200px;" />
     <span style="margin-left:8px;">物料：</span>
     <input nz-input placeholder="物料" [(ngModel)]="searchMaterial" style="width:200px;" />
-    <button nz-button nzType="primary"><i class="anticon anticon-search"></i></button>
+    <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
   </div>
 </div>
 
@@ -32,40 +32,37 @@
 <div class="table-card">
   <nz-table #reviewTable [nzData]="listOfData"
     nzSize="small"
-    [nzFrontPagination]="true"
-    [nzPageSize]="50"
-    [nzShowSizeChanger]="true"
-    [nzShowQuickJumper]="true"
-    [nzTotal]="1564"
-    [nzBordered]="false">
+    [nzBordered]="false"
+    [nzShowPagination]="false"
+    [nzScroll]="{ x: '1100px', y: 'calc(100vh - 280px)' }">
 
     <thead>
       <tr>
-        <th width="50">
+        <th nzLeft nzWidth="60px" nzAlign="center">
           <label nz-checkbox [(ngModel)]="checked"
             [nzIndeterminate]="indeterminate"
             (ngModelChange)="onAllChecked($event)"></label>
         </th>
-        <th width="60">序号</th>
-        <th>派工单号</th>
-        <th width="90">报工数量</th>
-        <th><a href="#">加工编号 1 <i class="anticon anticon-arrow-up"></i></a></th>
-        <th><a href="#">审核编号 <i class="anticon anticon-arrow-up"></i></a></th>
-        <th width="130">实动定额百分比</th>
-        <th width="60">需质检</th>
-        <th width="60">已质检</th>
-        <th>生产订单</th>
+        <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
+        <th nzWidth="120px">派工单号</th>
+        <th nzWidth="90px" nzAlign="center">报工数量</th>
+        <th nzWidth="130px">加工编号 1 <i class="anticon anticon-arrow-up"></i></th>
+        <th nzWidth="130px">审核编号 <i class="anticon anticon-arrow-up"></i></th>
+        <th nzWidth="140px">实动定额百分比</th>
+        <th nzWidth="60px" nzAlign="center">需质检</th>
+        <th nzWidth="60px" nzAlign="center">已质检</th>
+        <th nzWidth="130px">生产订单</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of reviewTable.data; let i = index">
-        <td>
+        <td nzLeft nzAlign="center">
           <label nz-checkbox [(ngModel)]="data.checked"
             (ngModelChange)="onItemChecked(data.id, $event)"></label>
         </td>
-        <td>{{ i + 1 }}<sup *ngIf="i < 3" style="color:#ff4d4f;">*</sup></td>
+        <td nzLeft nzAlign="center">{{ i + 1 }}<sup *ngIf="i < 3" style="color:#ff4d4f;">*</sup></td>
         <td>{{ data.dispatchNo }}</td>
-        <td>{{ data.reportQty }}</td>
+        <td nzAlign="center">{{ data.reportQty }}</td>
         <td><a style="color:#1890ff;">{{ data.processNo1 }}</a></td>
         <td><a style="color:#1890ff;">{{ data.reviewNo }}</a></td>
         <td>
@@ -77,26 +74,31 @@
             [nzShowInfo]="true">
           </nz-progress>
         </td>
-        <td><i *ngIf="data.needQc" class="anticon anticon-check" style="color:#52c41a;"></i></td>
-        <td><i *ngIf="data.qcDone" class="anticon anticon-check" style="color:#52c41a;"></i></td>
+        <td nzAlign="center"><i *ngIf="data.needQc" class="anticon anticon-check" style="color:#52c41a;"></i></td>
+        <td nzAlign="center"><i *ngIf="data.qcDone" class="anticon anticon-check" style="color:#52c41a;"></i></td>
         <td><a style="color:#1890ff;">{{ data.productionOrder }}</a></td>
       </tr>
     </tbody>
   </nz-table>
-
-  <!-- 底部操作栏 - 带操作按钮 -->
-  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;align-items:center;">
-    <div style="display:flex;gap:12px;">
-      <span style="cursor:pointer;"><i class="anticon anticon-edit"></i> 调整</span>
-      <span style="cursor:pointer;"><i class="anticon anticon-safety-certificate"></i> 审核</span>
-      <span style="cursor:pointer;"><i class="anticon anticon-safety"></i> 审核（全检）</span>
-      <span style="cursor:pointer;"><i class="anticon anticon-download"></i> 下载</span>
-    </div>
-    <div>共 1564 条</div>
-  </div>
 </div>
 
-<!-- 头像 -->
-<div style="position:fixed;bottom:20px;right:40px;">
-  <nz-avatar nzText="A" style="background-color:#1890ff;width:36px;height:36px;line-height:36px;font-size:16px;"></nz-avatar>
+<!-- 底部操作+分页栏 -->
+<div class="page-footer">
+  <div class="footer-left">
+    <button nz-button size="small"><i nz-icon nzType="edit"></i> 调整</button>
+    <button nz-button size="small"><i nz-icon nzType="safety-certificate"></i> 审核</button>
+    <button nz-button size="small"><i nz-icon nzType="safety"></i> 审核（全检）</button>
+    <button nz-button size="small"><i nz-icon nzType="download"></i> 下载</button>
+  </div>
+  <div class="footer-right">
+    共 1564 项
+    <nz-pagination
+      [nzPageIndex]="1"
+      [nzTotal]="1564"
+      [nzPageSize]="50"
+      nzSize="small"
+      [nzShowSizeChanger]="true"
+      [nzShowQuickJumper]="true">
+    </nz-pagination>
+  </div>
 </div>

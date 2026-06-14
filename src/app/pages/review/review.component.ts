@@ -35,25 +35,22 @@ export class ReviewComponent {
     { id: 10, dispatchNo: '0000001881', reportQty: 1, processNo1: '0000002256', reviewNo: '0000004358', actualPercent: 0, needQc: true, qcDone: true, productionOrder: '25000129' }
   ];
 
-  selectedData: Set<number> = new Set();
   checked = false;
   indeterminate = false;
 
   onAllChecked(checked: boolean): void {
     this.listOfData.forEach(item => (item.checked = checked));
-    this.refreshStatus();
+    this.refreshCheckedStatus();
   }
 
-  onItemChecked(id: number, checked: boolean): void {
-    if (checked) this.selectedData.add(id);
-    else this.selectedData.delete(id);
-    this.refreshStatus();
+  onItemChecked(_id: number, _checked: boolean): void {
+    this.refreshCheckedStatus();
   }
 
-  refreshStatus(): void {
-    const all = this.listOfData.every(item => item.checked);
-    const some = this.listOfData.some(item => item.checked);
-    this.checked = all;
-    this.indeterminate = !all && some;
+  refreshCheckedStatus(): void {
+    const allChecked = this.listOfData.every(item => item.checked);
+    const someChecked = this.listOfData.some(item => item.checked);
+    this.checked = allChecked;
+    this.indeterminate = !allChecked && someChecked;
   }
 }

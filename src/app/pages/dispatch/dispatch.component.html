@@ -1,12 +1,12 @@
 <!-- 顶部 -->
-<div style="margin-bottom:16px;display:flex;align-items:center;gap:16px;">
+<div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-shrink:0;">
   <nz-button-group>
     <button nz-button nzType="primary">
       <i class="anticon anticon-appstore"></i> 布局
     </button>
   </nz-button-group>
 
-  <!-- 面包屑 + 消息提示 -->
+  <!-- 面包屑 -->
   <nz-breadcrumb [nzSeparator]="'>'">
     <nz-breadcrumb-item>生产派工</nz-breadcrumb-item>
     <nz-breadcrumb-item>派工管理</nz-breadcrumb-item>
@@ -16,24 +16,24 @@
   <i class="anticon anticon-down-circle-o" style="font-size:18px;color:#999;cursor:pointer;"></i>
 </div>
 
-<!-- 错误提示条（模拟截图中的错误消息）-->
+<!-- 错误提示条 -->
 <nz-alert
   nzType="error"
   [nzMessage]="'分页查询派工单失败。null'"
   nzShowIcon
   nzClosable
-  style="margin-bottom:12px;"
-></nz-alert>
+  style="margin-bottom:12px;flex-shrink:0;">
+</nz-alert>
 
 <!-- 搜索栏 -->
-<div class="search-bar">
+<div class="search-bar" style="flex-shrink:0;">
   <div style="display:flex;align-items:center;gap:12px;">
     <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
     <span>生产订单：</span>
     <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
     <span style="margin-left:8px;">物料号：</span>
     <input nz-input placeholder="物料号（批量、模糊）" [(ngModel)]="searchMaterialNo" style="width:220px;" />
-    <button nz-button nzType="primary"><i class="anticon anticon-search"></i></button>
+    <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
   </div>
 </div>
 
@@ -41,37 +41,34 @@
 <div class="table-card">
   <nz-table #dispatchTable [nzData]="listOfData"
     nzSize="small"
-    [nzFrontPagination]="true"
-    [nzPageSize]="50"
-    [nzShowSizeChanger]="true"
-    [nzShowQuickJumper]="true"
-    [nzTotal]="1384"
-    [nzBordered]="false">
+    [nzBordered]="false"
+    [nzShowPagination]="false"
+    [nzScroll]="{ x: '1200px', y: 'calc(100vh - 320px)' }">
 
     <thead>
       <tr>
-        <th width="50">
+        <th nzLeft nzWidth="60px" nzAlign="center">
           <label nz-checkbox [(ngModel)]="checked"
             [nzIndeterminate]="indeterminate"
             (ngModelChange)="onAllChecked($event)"></label>
         </th>
-        <th width="60">序号</th>
-        <th><a href="#">工单编号 <i class="anticon anticon-arrow-down"></i></a></th>
-        <th><a href="#">直接派工单号 <i class="anticon anticon-arrow-down"></i><sup style="color:#ff4d4f;">1</sup></a></th>
-        <th><a href="#">生产订单 <i class="anticon anticon-arrow-up"></i></a></th>
-        <th>派工人员</th>
-        <th width="80">工单数量</th>
-        <th width="70">报废待扣</th>
-        <th width="80">加工状态</th>
+        <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
+        <th nzWidth="130px">工单编号 <i class="anticon anticon-arrow-down"></i></th>
+        <th nzWidth="150px">直接派工单号 <i class="anticon anticon-arrow-down"></i><sup style="color:#ff4d4f;">1</sup></th>
+        <th nzWidth="140px">生产订单 <i class="anticon anticon-arrow-up"></i></th>
+        <th nzWidth="200px">派工人员</th>
+        <th nzWidth="80px" nzAlign="center">工单数量</th>
+        <th nzWidth="80px" nzAlign="center">报废待扣</th>
+        <th nzWidth="80px" nzAlign="center">加工状态</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of dispatchTable.data; let i = index">
-        <td>
+        <td nzLeft nzAlign="center">
           <label nz-checkbox [(ngModel)]="data.checked"
             (ngModelChange)="onItemChecked(data.id, $event)"></label>
         </td>
-        <td>{{ i + 1 }}</td>
+        <td nzLeft nzAlign="center">{{ i + 1 }}</td>
         <td><a style="color:#1890ff;">{{ data.dispatchNo }}</a></td>
         <td><a style="color:#1890ff;">{{ data.directDispatchNo }}</a></td>
         <td><a style="color:#1890ff;">{{ data.productionOrder }}</a></td>
@@ -79,26 +76,31 @@
           <a style="color:#1890ff;">{{ data.worker }}</a>
           <i class="anticon anticon-export" style="color:#1890ff;margin-left:4px;font-size:12px;"></i>
         </td>
-        <td>{{ data.quantity }}</td>
-        <td>
+        <td nzAlign="center">{{ data.quantity }}</td>
+        <td nzAlign="center">
           <label nz-switch [(ngModel)]="data.scrapPending" nzCheckedChildren="已挂" nzUnCheckedChildren="已挂"></label>
         </td>
-        <td [style.color]="data.statusColor">{{ data.status }}</td>
+        <td nzAlign="center" [style.color]="data.statusColor">{{ data.status }}</td>
       </tr>
     </tbody>
   </nz-table>
-
-  <!-- 底部操作栏 -->
-  <div style="display:flex;justify-content:space-between;padding:12px 20px;border-top:1px solid #f0f0f0;font-size:13px;color:#666;">
-    <div>
-      <i class="anticon anticon-download"></i> 下发 &nbsp;
-      <i class="anticon anticon-ellipsis"></i> 更多 &nbsp;
-    </div>
-    <div>共 1384 条</div>
-  </div>
 </div>
 
-<!-- 头像 -->
-<div style="position:fixed;bottom:20px;right:40px;">
-  <nz-avatar nzText="A" style="background-color:#1890ff;width:36px;height:36px;line-height:36px;font-size:16px;"></nz-avatar>
+<!-- 底部操作+分页栏 -->
+<div class="page-footer">
+  <div class="footer-left">
+    <button nz-button size="small"><i nz-icon nzType="download"></i> 下发</button>
+    <button nz-button size="small"><i nz-icon nzType="ellipsis"></i> 更多</button>
+  </div>
+  <div class="footer-right">
+    共 1384 项
+    <nz-pagination
+      [nzPageIndex]="1"
+      [nzTotal]="1384"
+      [nzPageSize]="50"
+      nzSize="small"
+      [nzShowSizeChanger]="true"
+      [nzShowQuickJumper]="true">
+    </nz-pagination>
+  </div>
 </div>

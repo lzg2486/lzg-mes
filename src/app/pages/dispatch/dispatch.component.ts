@@ -19,11 +19,9 @@ interface DispatchRecord {
   styleUrls: ['./dispatch.component.css']
 })
 export class DispatchComponent {
-  // 搜索条件
   searchOrderNo = '';
   searchMaterialNo = '';
 
-  // 表格数据
   listOfData: DispatchRecord[] = [
     { id: 1, dispatchNo: '0000001985', directDispatchNo: '0000001898', productionOrder: '20000130758', worker: '4730-俞国生 ADMIN_MES-MES系统管理员', quantity: 10, scrapPending: true, status: '暂存', statusColor: '#faad14' },
     { id: 2, dispatchNo: '0000001982', directDispatchNo: '0000001897', productionOrder: '20000130757', worker: '4730-俞国生 ADMIN_MES-MES系统管理员', quantity: 10, scrapPending: true, status: '初始', statusColor: '#ff4d4f' },
@@ -37,7 +35,6 @@ export class DispatchComponent {
     { id: 10, dispatchNo: '0000001965', directDispatchNo: '0000001890', productionOrder: '20000130757', worker: 'ADMIN_MES-MES系统管理员', quantity: 10, scrapPending: true, status: '完成', statusColor: '#52c41a' }
   ];
 
-  selectedData: Set<number> = new Set();
   checked = false;
   indeterminate = false;
 
@@ -46,17 +43,12 @@ export class DispatchComponent {
     this.refreshCheckedStatus();
   }
 
-  onItemChecked(id: number, checked: boolean): void {
-    if (checked) {
-      this.selectedData.add(id);
-    } else {
-      this.selectedData.delete(id);
-    }
+  onItemChecked(_id: number, _checked: boolean): void {
     this.refreshCheckedStatus();
   }
 
   refreshCheckedStatus(): void {
-    const allChecked = this.listOfData.every(item => item.checked !== false && item.checked);
+    const allChecked = this.listOfData.every(item => item.checked);
     const someChecked = this.listOfData.some(item => item.checked);
     this.checked = allChecked;
     this.indeterminate = !allChecked && someChecked;
