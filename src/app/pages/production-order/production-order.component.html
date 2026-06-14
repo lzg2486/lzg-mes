@@ -21,15 +21,51 @@
   </nz-radio-group>
 </div>
 
-<!-- 搜索栏 -->
+<!-- 搜索栏（可展开收起） -->
 <div class="search-bar" style="flex-shrink:0;">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
-    <span>生产订单：</span>
-    <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
-    <span style="margin-left:8px;">物料号：</span>
-    <input nz-input placeholder="物料号（批量、模糊）" [(ngModel)]="searchMaterialNo" style="width:220px;" />
-    <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
+  <!-- 搜索图标 -->
+  <i class="anticon anticon-search-circle-o search-icon"></i>
+
+  <!-- 表单网格：查询条件 + 按钮都在同一网格中 -->
+  <div class="search-grid">
+    <div class="search-item">
+      <span class="search-label">生产订单：</span>
+      <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" />
+    </div>
+    <div class="search-item">
+      <span class="search-label">物料号：</span>
+      <input nz-input placeholder="物料号（批量、模糊）" [(ngModel)]="searchMaterialNo" />
+    </div>
+
+    <!-- 按钮组：始终在当前行的最后一格 -->
+    <div class="search-actions">
+      <button nz-button nzType="primary" size="small"><i class="anticon anticon-search"></i> 搜索</button>
+      <button nz-button size="small" (click)="resetSearch()"><i class="anticon anticon-reload"></i> 重置</button>
+      <button nz-button nzType="link" size="small" (click)="toggleSearch()">
+        <ng-container *ngIf="searchExpanded; else collapsedBtn">收起 <i class="anticon anticon-up"></i></ng-container>
+        <ng-template #collapsedBtn>展开 <i class="anticon anticon-down"></i></ng-template>
+      </button>
+    </div>
+
+    <!-- 展开时追加更多条件 -->
+    <ng-container *ngIf="searchExpanded">
+      <div class="search-item">
+        <span class="search-label new-field">工序号：</span>
+        <input nz-input placeholder="工序号" [(ngModel)]="searchProcessNo" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">工作中心：</span>
+        <input nz-input placeholder="工作中心" [(ngModel)]="searchWorkCenter" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">排序字符串：</span>
+        <input nz-input placeholder="排序字符串" [(ngModel)]="searchSortString" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">交货时间：</span>
+        <input nz-input type="date" placeholder="交货时间" [(ngModel)]="searchDeliveryDate" />
+      </div>
+    </ng-container>
   </div>
 </div>
 
@@ -39,7 +75,7 @@
     nzSize="small"
     [nzBordered]="false"
     [nzShowPagination]="false"
-    [nzScroll]="{ x: '1300px', y: 'calc(100vh - 280px)' }">
+    [nzScroll]="{ x: '1300px', y: scrollY }">
 
     <thead>
       <tr>
@@ -88,10 +124,11 @@
 <!-- 底部操作+分页栏 -->
 <div class="page-footer">
   <div class="footer-left">
-    <button nz-button size="small"><i nz-icon nzType="download"></i> 下发</button>
-    <button nz-button size="small"><i nz-icon nzType="pushpin"></i> 挂起</button>
-    <button nz-button size="small"><i nz-icon nzType="check-circle"></i> 完成</button>
-    <button nz-button size="small"><i nz-icon nzType="safety-certificate"></i> 可用性管理</button>
+    <button nz-button size="small">下发</button>
+    <button nz-button size="small">挂起</button>
+    <button nz-button size="small">完成</button>
+    <button nz-button size="small">可用性管理</button>
+    <button nz-button nzType="primary" size="small" (click)="showDispatchModal()">约料</button>
   </div>
   <div class="footer-right">
     共 25 项
@@ -105,3 +142,83 @@
     </nz-pagination>
   </div>
 </div>
+
+<!-- 约料规则弹框 -->
+<nz-modal
+  [(nzVisible)]="dispatchModalVisible"
+  nzTitle="约料规则"
+  nzWidth="640px"
+  [nzFooter]="null"
+  (nzOnCancel)="dispatchModalVisible = false">
+  <ng-container *nzModalContent>
+    <!-- 提示信息：紧凑布局 -->
+    <div class="dispatch-tips">
+      <p class="tip-main"><span class="tip-label">1、</span>部件编码的创建规则，同时也是后续发料的合单规则</p>
+      <div class="tip-row">
+        <span class="tip-label">部件编码：</span>
+        <span class="tip-red">【前8后3】只适用于14位物料编码</span>
+      </div>
+      <div class="tip-row">
+        <span class="tip-label">到料时间：</span>
+      </div>
+      <div class="tip-indent tip-red">【按需求时间】不同需求时间的道序行，拆分在不同的预派工单中。</div>
+      <div class="tip-indent tip-red">【向首单合并】不同需求时间道序行合并在一张预派工单中，取最早需求时间作为本单需求时间。</div>
+    </div>
+
+    <!-- 表单：两列布局（用原生按钮模拟单选组） -->
+    <div class="dispatch-form-grid">
+      <!-- 部件编码 -->
+      <div class="form-item">
+        <span class="form-lbl">部件编码：</span>
+        <div class="btn-group">
+          <button class="btn-opt" [class.active]="dispatchForm.partCode==='full'" (click)="dispatchForm.partCode='full'">完整</button>
+          <button class="btn-opt" [class.active]="dispatchForm.partCode==='pre8'" (click)="dispatchForm.partCode='pre8'">前8位</button>
+          <button class="btn-opt" [class.active]="dispatchForm.partCode==='pre8post3'" (click)="dispatchForm.partCode='pre8post3'">前8后3</button>
+        </div>
+      </div>
+      <!-- WBS -->
+      <div class="form-item">
+        <span class="form-lbl">WBS：</span>
+        <div class="btn-group">
+          <button class="btn-opt" [class.active]="dispatchForm.wbs==='full'" (click)="dispatchForm.wbs='full'">完整</button>
+          <button class="btn-opt" [class.active]="dispatchForm.wbs==='8-12'" (click)="dispatchForm.wbs='8-12'">8-12位</button>
+        </div>
+      </div>
+      <!-- 工作中心 -->
+      <div class="form-item">
+        <span class="form-lbl">工作中心：</span>
+        <div class="btn-group">
+          <button class="btn-opt active" (click)="dispatchForm.workCenter='full'">完整</button>
+        </div>
+      </div>
+      <!-- 工序号 -->
+      <div class="form-item">
+        <span class="form-lbl">工序号：</span>
+        <div class="btn-group">
+          <button class="btn-opt" [class.active]="dispatchForm.processNo==='full'" (click)="dispatchForm.processNo='full'">完整</button>
+          <button class="btn-opt" [class.active]="dispatchForm.processNo==='none'" (click)="dispatchForm.processNo='none'">无要求</button>
+        </div>
+      </div>
+      <!-- 到料时间 -->
+      <div class="form-item">
+        <span class="form-lbl">到料时间：</span>
+        <div class="btn-group">
+          <button class="btn-opt" [class.active]="dispatchForm.arrivalTime==='byDemand'" (click)="dispatchForm.arrivalTime='byDemand'">按需求时间</button>
+          <button class="btn-opt" [class.active]="dispatchForm.arrivalTime==='mergeFirst'" (click)="dispatchForm.arrivalTime='mergeFirst'">向首单合并</button>
+        </div>
+      </div>
+      <!-- 物料需求时间 -->
+      <div class="form-item">
+        <span class="form-lbl required">物料需求时间：</span>
+        <input nz-input placeholder="请选择日期" type="date" [(ngModel)]="dispatchForm.materialDate" />
+      </div>
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="dispatch-footer">
+      <button nz-button (click)="dispatchModalVisible = false">取消</button>
+      <button nz-button (click)="resetDispatchForm()">重置</button>
+      <button nz-button nzType="primary" (click)="submitDispatch()">提交</button>
+    </div>
+  </ng-container>
+</nz-modal>

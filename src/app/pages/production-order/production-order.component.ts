@@ -25,9 +25,34 @@ export class ProductionOrderComponent {
   // Tab 切换
   activeTab = 'MES';
 
+  // 搜索栏展开/收起
+  searchExpanded = false;
+
   // 搜索条件
   searchOrderNo = '';
   searchMaterialNo = '';
+  searchProcessNo = '';
+  searchWorkCenter = '';
+  searchSortString = '';
+  searchDeliveryDate = '';
+
+  toggleSearch(): void {
+    this.searchExpanded = !this.searchExpanded;
+  }
+
+  resetSearch(): void {
+    this.searchOrderNo = '';
+    this.searchMaterialNo = '';
+    this.searchProcessNo = '';
+    this.searchWorkCenter = '';
+    this.searchSortString = '';
+    this.searchDeliveryDate = '';
+  }
+
+  // 表格滚动高度：展开/收起自适应
+  get scrollY(): string {
+    return this.searchExpanded ? 'calc(100vh - 320px)' : 'calc(100vh - 270px)';
+  }
 
   // 表格数据
   listOfData: ProductionOrder[] = [
@@ -76,5 +101,38 @@ export class ProductionOrderComponent {
     const someChecked = this.listOfData.some(item => item.checked);
     this.checked = allChecked;
     this.indeterminate = !allChecked && someChecked;
+  }
+
+  // ======== 预派工单创建（约料弹框） ========
+  dispatchModalVisible = false;
+
+  dispatchForm = {
+    partCode: 'full',
+    wbs: 'full',
+    workCenter: 'full',
+    processNo: 'full',
+    arrivalTime: 'byDemand',
+    materialDate: ''
+  };
+
+  showDispatchModal(): void {
+    this.dispatchModalVisible = true;
+  }
+
+  resetDispatchForm(): void {
+    this.dispatchForm = {
+      partCode: 'full',
+      wbs: 'full',
+      workCenter: 'full',
+      processNo: 'full',
+      arrivalTime: 'byDemand',
+      materialDate: ''
+    };
+  }
+
+  submitDispatch(): void {
+    console.log('提交预派工单：', { ...this.dispatchForm });
+    // TODO: 调用接口提交
+    this.dispatchModalVisible = false;
   }
 }

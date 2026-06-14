@@ -10,6 +10,8 @@ import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 // Input
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
@@ -17,10 +19,14 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 // Feedback
 import { NzAlertModule } from 'ng-zorro-antd/alert';
-// Icon
-import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+// Drawer & Others
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+
 
 const NZ_MODULES = [
   NzLayoutModule,
@@ -28,14 +34,19 @@ const NZ_MODULES = [
   NzBreadCrumbModule,
   NzButtonModule,
   NzInputModule,
+  NzSelectModule,
+  NzDatePickerModule,
   NzRadioModule,
   NzCheckboxModule,
   NzSwitchModule,
   NzTableModule,
   NzPaginationModule,
   NzProgressModule,
+  NzTagModule,
   NzAlertModule,
-  NzIconModule,
+  NzModalModule,
+  NzDrawerModule,
+  NzBadgeModule,
 ];
 
 @NgModule({

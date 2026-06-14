@@ -1,0 +1,261 @@
+<div class="dispatch-assign-page">
+  <!-- 顶部面包屑：预派工单明细筛选 -->
+  <div class="header-bar">
+    <div class="breadcrumbs">
+      <!-- 全部 -->
+      <span class="bc-item" [class.active]="selectedDispatchFilter === null" (click)="selectedDispatchFilter = null">
+        <nz-tag [nzColor]="selectedDispatchFilter === null ? 'green' : 'default'">全部 ({{ totalDispatchCount }})</nz-tag>
+      </span>
+      <!-- 每个已勾选的预派工单 -->
+      <ng-container *ngFor="let item of dispatchOrderItems">
+        <span class="bc-sep">&gt;</span>
+        <span class="bc-item" [class.active]="selectedDispatchFilter === item.dispatchNo" (click)="selectedDispatchFilter = item.dispatchNo">
+          <nz-tag [nzColor]="selectedDispatchFilter === item.dispatchNo ? 'green' : 'default'">{{ item.dispatchNo }} ({{ item.count }})</nz-tag>
+        </span>
+      </ng-container>
+    </div>
+    <span class="close-btn" (click)="goBack()">✕</span>
+  </div>
+
+  <!-- 主体：左人员 右工作中心 -->
+  <div class="main-body">
+    <!-- 左侧：人员选择 -->
+    <div class="left-panel">
+      <!-- 搜索栏 -->
+      <div class="search-row">
+        <span class="search-icon">&gt;</span>
+        <input nz-input placeholder="请输入姓名或工号" [(ngModel)]="personSearch" />
+        <button nz-button nzType="primary" nzShape="circle">搜索</button>
+      </div>
+
+      <!-- 标签页 + 人数 -->
+      <div class="tab-header">
+        <div class="tabs">
+          <span [class.active]="personTab === 'all'" (click)="personTab='all'">所有</span>
+          <span [class.active]="personTab === 'selected'" (click)="personTab='selected'">已选</span>
+        </div>
+        <span class="count">共 {{ filteredPersons.length }} 人</span>
+      </div>
+
+      <!-- 取消按钮（仅已选tab显示） -->
+      <div class="cancel-area" *ngIf="personTab === 'selected'">
+        <label><input type="radio" checked disabled /> 取消</label>
+      </div>
+
+      <!-- 人员列表 -->
+      <div class="person-list">
+        <div
+          *ngFor="let p of filteredPersons"
+          class="person-item"
+          [class.selected]="p.selected"
+          (click)="togglePerson(p)"
+        >
+          <span class="emp-name">{{ p.empNo }}-{{ p.name }}</span>
+          <span class="team-name">{{ p.team }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：工作中心分配 -->
+    <div class="right-panel">
+      <!-- 总加工中心工具栏 -->
+      <div class="wc-toolbar">
+        <span class="label">总加工中心：</span>
+        <nz-select
+          [(ngModel)]="totalWorkCenter"
+          style="width: 240px;"
+          placeholder="请选择总加工中心"
+          nzAllowClear
+          [nzDisabled]="lockWorkCenter"
+          [nzOptions]="workCenterOptions"
+        ></nz-select>
+        <span
+          class="lock-icon"
+          (click)="lockWorkCenter = !lockWorkCenter"
+          [class.locked]="lockWorkCenter"
+        >{{ lockWorkCenter ? '🔒' : '🔓' }}</span>
+      </div>
+
+      <!-- 分配表格（使用nz-table） -->
+      <div class="table-wrapper">
+        <table class="assign-table">
+          <thead>
+            <tr>
+              <th class="col-check">
+                <input type="checkbox" [checked]="allRowsChecked" (change)="onAllRowChecked($event)" />
+              </th>
+              <th class="col-wc">加工中心</th>
+              <th class="col-count">加工数</th>
+              <th class="col-qa">质检</th>
+              <th class="col-wcname">工作中心</th>
+              <th class="col-dispatch">预制派工单号</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rows">
+              <td class="col-check">
+                <input type="checkbox" [(ngModel)]="row.checked" />
+              </td>
+              <td class="col-wc">
+                <nz-select
+                  [(ngModel)]="row.workCenterId"
+                  [nzOptions]="workCenterOptions"
+                  style="width:100%"
+                  placeholder="请选择加工中心"
+                  (ngModelChange)="onWorkCenterChange(row)"
+                ></nz-select>
+              </td>
+              <td class="col-count">
+                <input nz-input type="number" [(ngModel)]="row.productionCount" [nzSize]="'small'" style="width:70px" />
+              </td>
+              <td class="col-qa" align="center">
+                <input type="checkbox" [(ngModel)]="row.qualityCheck" />
+              </td>
+              <td class="col-wcname">{{ row.workCenterName }}</td>
+              <td class="col-dispatch"><span class="dispatch-no" [title]="row.dispatchNo">{{ row.dispatchNo }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 表格下方操作按钮行 -->
+      <div class="table-actions">
+          <button nz-button nzSize="small" nzType="primary" (click)="autoFill()">
+            自动填充
+          </button>
+          <button nz-button nzSize="small" (click)="clearWorkCenters()">
+            清除加工中心
+          </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部操作栏 -->
+  <div class="bottom-bar">
+    <!-- 左侧：返回 -->
+    <div class="bar-left">
+      <a class="back-link" (click)="goBack()">← 返回</a>
+    </div>
+
+    <!-- 中间：选项区 -->
+    <div class="bar-center">
+      <div class="option-group">
+        <label class="opt-label" title="默认勾选且禁用">
+          <input type="checkbox" checked disabled /> 关联AGV
+        </label>
+        <label class="opt-label">
+          <input type="checkbox" [(ngModel)]="addShift" /> 加班
+        </label>
+        <label class="opt-label" title="默认勾选且禁用">
+          <input type="checkbox" checked disabled /> 关联
+        </label>
+        <label class="opt-label">
+          <input type="checkbox" [(ngModel)]="parallel" /> 并行
+        </label>
+      </div>
+
+      <div class="priority-wrap">
+        <span class="prio-text">优先级：</span>
+        <div class="priority-group">
+          <label [class.active]="priority==='low'" (click)="priority='low'">低</label>
+          <label [class.active]="priority==='medium'" (click)="priority='medium'">中</label>
+          <label [class.active]="priority==='high'" (click)="priority='high'">高</label>
+        </div>
+      </div>
+
+      <div class="machine-wrap">
+        <span>机器台数：</span>
+        <input nz-input type="number" [(ngModel)]="machineCount" [nzSize]="'small'" style="width:56px" />
+      </div>
+    </div>
+
+    <!-- 右侧：操作按钮 -->
+    <div class="bar-right">
+      <button nz-button nzType="primary" (click)="addToBackup()" class="btn-add-backup">
+        + 加入备选
+      </button>
+      <a class="link-view-backup" (click)="viewBackup()">
+        查看备选流水单<span class="badge">({{ currentFilteredCount }})</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- 备选工单池抽屉 -->
+<nz-drawer
+  [nzVisible]="backupDrawerVisible"
+  [nzTitle]="selectedDispatchFilter ? ('备选加工单 - ' + selectedDispatchFilter) : '备选加工单 - 全部预派工单'"
+  nzWidth="1100"
+  [nzClosable]="true"
+  [nzBodyStyle]="{ padding: '0', background: '#fff' }"
+  (nzOnClose)="backupDrawerVisible = false">
+  <ng-container *nzDrawerContent>
+    <div class="backup-drawer">
+      <div class="backup-table-wrap">
+        <nz-table
+          #backupTable
+          [nzData]="backupRows"
+          nzSize="small"
+          [nzBordered]="false"
+          [nzFrontPagination]="true"
+          [nzPageSize]="20"
+          [nzTotal]="backupRows.length"
+          [nzShowSizeChanger]="true"
+          [nzPageSizeOptions]="[10, 20, 50]"
+          *ngIf="backupRows.length > 0; else emptyBackup">
+          <thead>
+            <tr>
+              <th width="50px" align="center">#</th>
+              <th width="80px">操作员</th>
+              <th width="180px">预制派工单号</th>
+              <th width="150px">订单号</th>
+              <th width="140px">部件编码</th>
+              <th width="100px">WBS</th>
+              <th width="70px">工序号</th>
+              <th width="90px" align="right">数量</th>
+              <th width="80px" align="center">班次</th>
+              <th width="70px">优先级</th>
+              <th width="60px">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of backupTable.data; let i = index">
+              <td align="center">{{ (backupTable.nzPageIndex - 1) * backupTable.nzPageSize + i + 1 }}</td>
+              <td>
+                <span class="worker-icon-small">👤</span>
+                <span class="worker-name-small">MES管理员</span>
+              </td>
+              <td><span class="dispatch-no">{{ row.dispatchNo }}</span></td>
+              <td><a style="color:#1890ff;">{{ row.orderNo }}</a></td>
+              <td>{{ row.partCode }}</td>
+              <td>{{ row.wbs || '-' }}</td>
+              <td><span class="process-highlight">{{ row.processNo }}</span></td>
+              <td align="right">{{ row.quantity }}</td>
+              <td align="center">
+                <span class="shift-badge sun">☀</span>
+                <span class="shift-badge moon">🌙</span>
+              </td>
+              <td>
+                <label [class]="'prio-tag prio-' + row.priority" (click)="_togglePriority(row)">{{ _priorityText(row.priority) }}</label>
+              </td>
+              <td>
+                <a (click)="_removeBackupRow(row.id)" class="link-delete">删除</a>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+        <ng-template #emptyBackup>
+          <div class="empty-tip">暂无备选工单数据</div>
+        </ng-template>
+      </div>
+      <div class="drawer-footer">
+        <button nz-button nzType="primary" (click)="_saveBackup()">
+          保存
+        </button>
+        <button nz-button nzType="default" (click)="_saveAndSendBackup()">
+          保存并下发
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</nz-drawer>

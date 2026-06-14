@@ -1,0 +1,356 @@
+<!-- 面包屑 -->
+<div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-shrink:0;">
+  <nz-breadcrumb [nzSeparator]="'>'">
+    <nz-breadcrumb-item>生产派工</nz-breadcrumb-item>
+    <nz-breadcrumb-item>约料管理</nz-breadcrumb-item>
+  </nz-breadcrumb>
+</div>
+
+<!-- 搜索栏（可展开收起，与生产订单一致） -->
+<div class="search-bar" style="flex-shrink:0;">
+  <i class="anticon anticon-search-circle-o search-icon"></i>
+  <div class="search-grid">
+    <!-- 第一行：默认显示 -->
+    <div class="search-item">
+      <span class="search-label">WBS：</span>
+      <input nz-input placeholder="请输入" [(ngModel)]="searchWbs" />
+    </div>
+    <div class="search-item">
+      <span class="search-label">预派工单：</span>
+      <input nz-input placeholder="请输入" [(ngModel)]="searchDispatchNo" />
+    </div>
+
+    <!-- 按钮组 -->
+    <div class="search-actions">
+      <button nz-button nzType="primary" size="small"><i class="anticon anticon-search"></i> 查询</button>
+      <button nz-button size="small" (click)="resetSearch()"><i class="anticon anticon-reload"></i> 重置</button>
+      <button nz-button nzType="link" size="small" (click)="toggleSearch()">
+        <ng-container *ngIf="searchExpanded; else collapsedBtn">收起 <i class="anticon anticon-up"></i></ng-container>
+        <ng-template #collapsedBtn>展开 <i class="anticon anticon-down"></i></ng-template>
+      </button>
+    </div>
+
+    <!-- 展开时追加更多条件 -->
+    <ng-container *ngIf="searchExpanded">
+      <div class="search-item">
+        <span class="search-label new-field">部件编码：</span>
+        <input nz-input placeholder="请输入" [(ngModel)]="searchPartCode" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">工序号：</span>
+        <input nz-input placeholder="请输入" [(ngModel)]="searchProcessNo" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">工作中心：</span>
+        <input nz-input placeholder="请输入" [(ngModel)]="searchWorkCenter" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">排序字符串：</span>
+        <input nz-input placeholder="请输入" [(ngModel)]="searchSortString" />
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">状态：</span>
+        <nz-select nzPlaceHolder="全部" [(ngModel)]="searchStatus" style="flex:1;" [nzDropdownMatchSelectWidth]="false">
+          <nz-option *ngFor="let opt of statusOptions" [nzLabel]="opt.label" [nzValue]="opt.value"></nz-option>
+        </nz-select>
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">确认到料时间：</span>
+        <nz-range-picker [(ngModel)]="searchConfirmDateRange" nzFormat="yyyy-MM-dd" [nzShowTime]="false"></nz-range-picker>
+      </div>
+      <div class="search-item">
+        <span class="search-label new-field">物料需求时间：</span>
+        <nz-range-picker [(ngModel)]="searchDemandDateRange" nzFormat="yyyy-MM-dd" [nzShowTime]="false"></nz-range-picker>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<!-- 表格 -->
+<div class="table-card">
+  <nz-table #dispatchTable [nzData]="listOfData"
+    nzSize="small"
+    [nzBordered]="false"
+    [nzShowPagination]="false"
+    [nzScroll]="{ x: '1500px', y: scrollY }">
+
+    <thead>
+      <tr>
+        <th nzLeft nzWidth="50px" nzAlign="center">
+          <label nz-checkbox [(ngModel)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (ngModelChange)="onAllChecked($event)"></label>
+        </th>
+        <th nzLeft nzWidth="50px" nzAlign="center">序号</th>
+        <th nzLeft nzWidth="170px">预派工单</th>
+        <th nzLeft nzWidth="130px">部件编码</th>
+        <th nzWidth="110px">物料需求时间<br><span style="font-weight:400;color:#999;font-size:11px;">确认到料时间</span></th>
+        <th nzWidth="70px">WBS</th>
+        <th nzWidth="60px" nzAlign="center">工序</th>
+        <th nzWidth="70px">工作中心</th>
+        <th nzWidth="90px">排序字符串</th>
+        <th nzWidth="60px" nzAlign="center">投产数</th>
+        <th nzWidth="80px" nzAlign="center">组件数<br><span style="font-weight:400;color:#999;font-size:11px;">关键组件数</span></th>
+        <th nzWidth="80px" nzAlign="center">状态</th>
+        <th nzWidth="90px" nzAlign="center">组件到位率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of dispatchTable.data; let i = index">
+        <td nzLeft nzAlign="center">
+          <label nz-checkbox [(ngModel)]="data.checked"
+            (ngModelChange)="onItemChecked(data.id, $event)"></label>
+        </td>
+        <td nzLeft nzAlign="center">{{ i + 1 }}</td>
+        <td nzLeft><a style="color:#1890ff;cursor:pointer;" (click)="openDetail(data)">{{ data.dispatchNo }}</a></td>
+        <td nzLeft><a style="color:#1890ff;cursor:pointer;" (click)="openPartOrder(data)">{{ data.partCode }}</a></td>
+        <td>{{ data.demandDate || '-' }}<br><span *ngIf="data.confirmDate">{{ data.confirmDate }}</span><span *ngIf="!data.confirmDate">-</span></td>
+        <td>{{ data.wbs || '-' }}</td>
+        <td><span class="process-highlight">{{ data.processNo }}</span></td>
+        <td>{{ data.workCenter }}</td>
+        <td>{{ data.sortString || '-' }}</td>
+        <td nzAlign="center">{{ data.productionCount }}</td>
+        <td nzAlign="center">
+          <div class="component-count-cell">
+            <span class="component-count-main">{{ data.componentCount }}</span><br>
+            <span class="component-count-sub">{{ data.keyComponentCount }}</span>
+          </div>
+        </td>
+        <td nzAlign="center">
+          <nz-tag [nzColor]="getStatusConfig(data.status).color">{{ getStatusConfig(data.status).text }}</nz-tag>
+        </td>
+        <td nzAlign="center">
+          <ng-container *ngIf="data.status === 'delivered'; else emptyRate">
+            <div class="rate-cell" [style.cursor]="data.componentRate < 100 ? 'pointer' : 'default'" (click)="openShortage(data)">
+              <div class="rate-bar-wrapper">
+                <div class="rate-bar-fill" [style.width.%]="data.componentRate"></div>
+                <span class="rate-text">{{ data.componentRate | number:'1.0-0' }}%</span>
+              </div>
+              <span class="rate-detail">{{ data.componentArrived }}/{{ data.componentCount }}</span>
+            </div>
+          </ng-container>
+          <ng-template #emptyRate><span style="color:#ccc;">-</span></ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>
+
+<!-- 底部操作+分页栏（与生产订单一致） -->
+<div class="page-footer">
+  <div class="footer-left">
+    <ng-container *ngIf="actionButton; else noAction">
+      <button nz-button nzType="primary" size="small" (click)="handleAction()">
+        {{ actionButton }}
+      </button>
+    </ng-container>
+    <ng-template #noAction>
+      <button nz-button size="small" disabled>请勾选记录</button>
+    </ng-template>
+  </div>
+  <div class="footer-right">
+    共 {{ listOfData.length }} 项
+    <nz-pagination
+      [nzPageIndex]="1"
+      [nzTotal]="listOfData.length"
+      [nzPageSize]="50"
+      nzSize="small"
+      [nzShowSizeChanger]="true"
+      [nzShowQuickJumper]="true">
+    </nz-pagination>
+  </div>
+</div>
+
+<!-- 明细弹窗 -->
+<nz-modal
+  [(nzVisible)]="detailVisible"
+  [nzTitle]="'成分明细'"
+  [nzFooter]="null"
+  [nzWidth]="960"
+  [nzBodyStyle]="{ padding: '0', maxHeight: '70vh', overflow: 'auto' }"
+  (nzOnCancel)="detailVisible = false">
+  <ng-container *nzModalContent>
+    <!-- 信息栏 -->
+    <div class="detail-info-bar">
+      <div class="info-row">
+        <span class="info-item"><b>预派工单：</b>{{ currentDetail?.dispatchNo }}</span>
+        <span class="info-item"><b>状态：</b><nz-tag [nzColor]="currentDetail ? getStatusConfig(currentDetail.status).color : 'default'" nzSize="small">{{ currentDetail ? getStatusConfig(currentDetail.status).text : '' }}</nz-tag></span>
+        <span class="info-item"><b>wbs：</b>{{ currentDetail?.wbs || '-' }}</span>
+        <span class="info-item"><b>部件编码：</b>{{ currentDetail?.partCode }}</span>
+        <span class="info-item" *ngIf="currentDetail"><b>工序号：</b>{{ currentDetail.processNo }}</span>
+        <span class="info-item" *ngIf="currentDetail"><b>工作中心：</b>{{ currentDetail.workCenter }}</span>
+        <span class="info-item" *ngIf="currentDetail"><b>组件数：</b>{{ currentDetail.componentCount }}</span>
+        <span class="info-item" *ngIf="currentDetail"><b>关键组件数：</b>{{ currentDetail.keyComponentCount }}</span>
+      </div>
+    </div>
+    <!-- 明细表格 -->
+    <div class="detail-table-wrap">
+      <nz-table #detailTable [nzData]="detailRows"
+        nzSize="small"
+        [nzBordered]="false"
+        [nzFrontPagination]="true"
+        [nzPageSize]="20"
+        [nzTotal]="detailRows.length"
+        [nzShowSizeChanger]="true"
+        [nzPageSizeOptions]="[10, 20, 50]">
+        <thead>
+          <tr>
+            <th width="50px" align="center">#</th>
+            <th width="140px">订单号</th>
+            <th width="200px">物料</th>
+            <th width="130px">部件编码</th>
+            <th width="80px">wbs</th>
+            <th width="80px">工序号</th>
+            <th width="80px" align="right">数量</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of detailTable.data; let i = index">
+            <td align="center">{{ i + 1 + (detailPageIndex - 1) * detailPageSize }}</td>
+            <td><a style="color:#1890ff;">{{ row.orderNo }}</a></td>
+            <td>
+              <div class="material-cell">
+                {{ row.materialCode }}<br>
+                <span class="material-name">{{ row.materialName }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="part-cell">
+                {{ row.partCode }}<br>
+                <span class="part-name">{{ row.partName }}</span>
+              </div>
+            </td>
+            <td>{{ row.wbs || '-' }}</td>
+            <td>{{ row.processNo }}</td>
+            <td align="right">{{ row.quantity | number:'1.3-3' }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </ng-container>
+</nz-modal>
+
+<!-- 工单明细弹窗（点击部件编码弹出，按订单号+部件编码+wbs+工序号去重，不展示物料） -->
+<nz-modal
+  [(nzVisible)]="partOrderVisible"
+  [nzTitle]="'工单明细'"
+  [nzFooter]="null"
+  [nzWidth]="720"
+  [nzBodyStyle]="{ padding: '0', maxHeight: '70vh', overflow: 'auto' }"
+  (nzOnCancel)="partOrderVisible = false">
+  <ng-container *nzModalContent>
+    <!-- 信息栏 -->
+    <div class="detail-info-bar">
+      <div class="info-row">
+        <span class="info-item"><b>部件编码：</b>{{ partOrderItem?.partCode }}</span>
+        <span class="info-item"><b>预派工单：</b>{{ partOrderItem?.dispatchNo }}</span>
+        <span class="info-item"><b>状态：</b><nz-tag [nzColor]="partOrderItem ? getStatusConfig(partOrderItem.status).color : 'default'" nzSize="small">{{ partOrderItem ? getStatusConfig(partOrderItem.status).text : '' }}</nz-tag></span>
+        <span class="info-item" *ngIf="partOrderItem"><b>投产数：</b>{{ partOrderItem.productionCount }}</span>
+      </div>
+    </div>
+    <!-- 工单明细表格 -->
+    <div class="detail-table-wrap">
+      <nz-table #partOrderTable [nzData]="partOrderRows"
+        nzSize="small"
+        [nzBordered]="false"
+        [nzFrontPagination]="true"
+        [nzPageSize]="20"
+        [nzTotal]="partOrderRows.length"
+        [nzShowSizeChanger]="true"
+        [nzPageSizeOptions]="[10, 20, 50]">
+        <thead>
+          <tr>
+            <th width="50px" align="center">#</th>
+            <th width="150px">订单号</th>
+            <th width="150px">部件编码</th>
+            <th width="90px">wbs</th>
+            <th width="80px">工序号</th>
+            <th width="90px" align="right">数量</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of partOrderTable.data; let i = index">
+            <td align="center">{{ i + 1 }}</td>
+            <td><a style="color:#1890ff;">{{ row.orderNo }}</a></td>
+            <td>{{ row.partCode }}</td>
+            <td>{{ row.wbs || '-' }}</td>
+            <td>{{ row.processNo }}</td>
+            <td align="right">{{ row.quantity | number:'1.3-3' }}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </ng-container>
+</nz-modal>
+
+<!-- 缺件信息弹窗 -->
+<nz-modal
+  [(nzVisible)]="shortageVisible"
+  [nzTitle]="'缺件信息'"
+  [nzFooter]="null"
+  [nzWidth]="1100"
+  [nzBodyStyle]="{ padding: '0', maxHeight: '70vh', overflow: 'auto' }"
+  (nzOnCancel)="shortageVisible = false">
+  <ng-container *nzModalContent>
+    <!-- 信息栏 -->
+    <div class="detail-info-bar">
+      <div class="info-row">
+        <span class="info-item"><b>预派工单：</b>{{ currentShortageItem?.dispatchNo }}</span>
+        <span class="info-item"><b>状态：</b><nz-tag [nzColor]="currentShortageItem ? getStatusConfig(currentShortageItem.status).color : 'default'" nzSize="small">{{ currentShortageItem ? getStatusConfig(currentShortageItem.status).text : '' }}</nz-tag></span>
+        <span class="info-item"><b>wbs：</b>{{ currentShortageItem?.wbs || '-' }}</span>
+        <span class="info-item"><b>部件编码：</b>{{ currentShortageItem?.partCode }}</span>
+        <span class="info-item" *ngIf="currentShortageItem"><b>工序号：</b>{{ currentShortageItem.processNo }}</span>
+        <span class="info-item" *ngIf="currentShortageItem"><b>工作中心：</b>{{ currentShortageItem.workCenter }}</span>
+        <span class="info-item" *ngIf="currentShortageItem"><b>组件数：</b>{{ currentShortageItem.componentCount }}</span>
+        <span class="info-item shortage-highlight" *ngIf="currentShortageItem"><b>缺件数：</b>{{ currentShortageItem.componentCount - currentShortageItem.componentArrived }}</span>
+      </div>
+    </div>
+    <!-- 缺件表格 -->
+    <div class="detail-table-wrap">
+      <nz-table #shortageTable [nzData]="shortageRows"
+        nzSize="small"
+        [nzBordered]="false"
+        [nzFrontPagination]="true"
+        [nzPageSize]="20"
+        [nzTotal]="shortageRows.length"
+        [nzShowSizeChanger]="true"
+        [nzPageSizeOptions]="[10, 20, 50]">
+        <thead>
+          <tr>
+            <th width="50px" align="center">#</th>
+            <th width="130px">订单号</th>
+            <th width="70px">采购组</th>
+            <th width="180px">物料</th>
+            <th width="140px">预留号<br>预留行号</th>
+            <th width="70px">wbs</th>
+            <th width="80px">SQ追溯</th>
+            <th width="90px" align="right">需求数量</th>
+            <th width="100px" align="right">1050/发料数量</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of shortageTable.data; let i = index">
+            <td align="center">{{ i + 1 }}</td>
+            <td><a style="color:#1890ff;">{{ row.orderNo }}</a></td>
+            <td>{{ row.purchaseGroup }}</td>
+            <td>
+              <div class="material-cell">
+                {{ row.materialCode }}<br>
+                <span class="material-name">{{ row.materialName }}</span>
+              </div>
+            </td>
+            <td>
+              <div style="line-height:1.5;">
+                {{ row.reserveNo }}
+              </div>
+            </td>
+            <td>{{ row.wbs || '-' }}</td>
+            <td>{{ row.sqTrace || '-' }}</td>
+            <td align="right">{{ row.demandQty | number:'1.4-4' }}</td>
+            <td align="right"><span class="shortage-qty">{{ row.issuedQty | number:'1.4-4' }}</span></td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+  </ng-container>
+</nz-modal>

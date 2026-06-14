@@ -11,9 +11,10 @@ export class AppComponent implements OnInit {
   isCollapsed = false;
   currentMenu = '生产订单';
 
-  // 菜单数据 - 仅保留5个
+  // 菜单数据
   menus = [
     { label: '生产订单', route: '/' },
+    { label: '约料管理', route: '/material-dispatch' },
     { label: '工单生成', route: '/work-order' },
     { label: '派工管理', route: '/dispatch' },
     { label: '生产加工', route: '/processing' },
