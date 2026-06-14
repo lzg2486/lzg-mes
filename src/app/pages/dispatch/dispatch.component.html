@@ -16,15 +16,6 @@
   <i class="anticon anticon-down-circle-o" style="font-size:18px;color:#999;cursor:pointer;"></i>
 </div>
 
-<!-- 错误提示条 -->
-<nz-alert
-  nzType="error"
-  [nzMessage]="'分页查询派工单失败。null'"
-  nzShowIcon
-  nzClosable
-  style="margin-bottom:12px;flex-shrink:0;">
-</nz-alert>
-
 <!-- 搜索栏 -->
 <div class="search-bar" style="flex-shrink:0;">
   <div style="display:flex;align-items:center;gap:12px;">
@@ -60,12 +51,14 @@
         <th nzWidth="80px" nzAlign="center">工单数量</th>
         <th nzWidth="80px" nzAlign="center">报废待扣</th>
         <th nzWidth="80px" nzAlign="center">加工状态</th>
+        <th nzWidth="80px" nzAlign="center">生产模式</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of dispatchTable.data; let i = index">
         <td nzLeft nzAlign="center">
           <label nz-checkbox [(ngModel)]="data.checked"
+            [nzDisabled]="data.isMaterialReserved"
             (ngModelChange)="onItemChecked(data.id, $event)"></label>
         </td>
         <td nzLeft nzAlign="center">{{ i + 1 }}</td>
@@ -81,6 +74,9 @@
           <label nz-switch [(ngModel)]="data.scrapPending" nzCheckedChildren="已挂" nzUnCheckedChildren="已挂"></label>
         </td>
         <td nzAlign="center" [style.color]="data.statusColor">{{ data.status }}</td>
+        <td nzAlign="center">
+          <span [class.ys-tag]="data.isMaterialReserved" [class.ys-default]="!data.isMaterialReserved">{{ data.productionMode }}</span>
+        </td>
       </tr>
     </tbody>
   </nz-table>

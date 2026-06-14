@@ -64,11 +64,10 @@ export class DispatchAssignComponent {
     return this.dispatchOrderItems.reduce((sum, item) => sum + item.count, 0);
   }
 
-  // 当前筛选下的明细数量
+  // 当前备选池中的实际条数
   get currentFilteredCount(): number {
-    if (!this.selectedDispatchFilter) return this.totalDispatchCount;
-    const item = this.dispatchOrderItems.find(i => i.dispatchNo === this.selectedDispatchFilter);
-    return item?.count || 0;
+    if (!this.selectedDispatchFilter) return this.backupRows.length;
+    return this.backupRows.filter(r => r.dispatchNo === this.selectedDispatchFilter).length;
   }
 
   // ---- 左侧：人员选择 ----
@@ -205,8 +204,7 @@ export class DispatchAssignComponent {
   backupRows: BackupRow[] = [];
   backupDrawerVisible = false;
 
-  viewBackup(filterDispatchNo?: string | null): void {
-    this.backupRows = this.generateBackupData(filterDispatchNo ?? this.selectedDispatchFilter);
+  viewBackup(_filterDispatchNo?: string | null): void {
     this.backupDrawerVisible = true;
   }
 
@@ -241,9 +239,16 @@ export class DispatchAssignComponent {
       this.message.warning('当前筛选下无可用记录');
       return;
     }
+    // 去重：已存在于备选池的不再添加
+    const existingKeys = new Set(this.backupRows.map(r => `${r.dispatchNo}|${r.orderNo}|${r.partCode}|${r.wbs}|${r.processNo}`));
+    const toAdd = newRows.filter(r => !existingKeys.has(`${r.dispatchNo}|${r.orderNo}|${r.partCode}|${r.wbs}|${r.processNo}`));
+    if (toAdd.length === 0) {
+      this.message.info('所选记录已全部在备选池中');
+      return;
+    }
     // 生成新数据追加到备选池
-    this.backupRows.push(...newRows);
-    this.message.success(`已添加 ${newRows.length} 条到备选工单池`);
+    this.backupRows.push(...toAdd);
+    this.message.success(`已添加 ${toAdd.length} 条到备选工单池`);
   }
 
   /** 根据当前勾选的行生成备选子项，使用与约料管理工单明细相同的数据源并可筛选 */

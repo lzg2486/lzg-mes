@@ -41,7 +41,7 @@
     nzSize="small"
     [nzBordered]="false"
     [nzShowPagination]="false"
-    [nzScroll]="{ x: '1100px', y: 'calc(100vh - 280px)' }">
+    [nzScroll]="{ x: '1200px', y: 'calc(100vh - 280px)' }">
 
     <thead>
       <tr>
@@ -60,13 +60,16 @@
         <th nzWidth="70px" nzAlign="center">调度员</th>
         <th nzWidth="80px" nzAlign="center">生产工厂</th>
         <th nzWidth="120px">WBS元素</th>
+        <th nzWidth="80px" nzAlign="center">生产模式</th>
         <th nzWidth="60px" nzAlign="center">开关</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let data of workTable.data; let i = index">
         <td nzLeft nzAlign="center">
-          <label nz-checkbox [(ngModel)]="data.checked"
+          <label nz-checkbox
+            [(ngModel)]="data.checked"
+            [nzDisabled]="data.isMaterialReserved"
             (ngModelChange)="onItemChecked(data.id, $event)"></label>
         </td>
         <td nzLeft nzAlign="center">{{ i + 1 }}</td>
@@ -79,6 +82,9 @@
         <td nzAlign="center">{{ data.dispatcher || '-' }}</td>
         <td nzAlign="center">{{ data.factory }}</td>
         <td>{{ data.wbsElement }}</td>
+        <td nzAlign="center">
+          <span [class.ys-tag]="data.isMaterialReserved" [class.ys-default]="!data.isMaterialReserved">{{ data.productionMode }}</span>
+        </td>
         <td nzAlign="center">
           <label nz-switch [(ngModel)]="data.switchOn"></label>
         </td>

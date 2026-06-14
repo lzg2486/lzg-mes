@@ -42,3 +42,281 @@
 :host ::ng-deep .ant-table-thead .ant-table-cell-fix-right {
   background: #fafafa;
 }
+
+/* 约料标签 */
+.ys-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+.ys-default {
+  color: #bbb;
+}
+
+/* ========== 工单明细弹窗 ========== */
+.detail-info-bar {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+.info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: center;
+}
+.info-item {
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+}
+.info-item b {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-table-wrap {
+  padding: 0;
+}
+
+/* 弹窗表格样式 */
+::host ::ng-deep nz-modal .detail-table-wrap .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: #555;
+}
+::host ::ng-deep nz-modal .detail-table-wrap .ant-table-tbody > tr:hover > td {
+  background: #e6f7ff;
+}
+
+/* ========== 点收开工弹窗 ========== */
+
+/* 扫描区域 */
+.scan-area {
+  padding: 24px 20px;
+  display: flex;
+  justify-content: center;
+  background: #f0f2f5;
+}
+
+.scan-box {
+  width: 420px;
+  height: 160px;
+  border: 2px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* 扫描横线动画 */
+.scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ff4d4f;
+  box-shadow: 0 0 8px 2px rgba(255, 77, 79, 0.5);
+  animation: scanMove 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes scanMove {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}
+
+.scan-bg-text {
+  color: #bfbfbf;
+  font-size: 15px;
+  letter-spacing: 2px;
+  z-index: 1;
+}
+
+/* 扫描完成状态 */
+.scan-box.scan-done {
+  border-color: #52c41a;
+  background: #f6ffed;
+}
+
+.scan-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.scan-result-text {
+  font-size: 16px;
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.scan-result-no {
+  font-size: 20px;
+  color: #333;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* 结果信息栏 */
+.scan-info-bar {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+/* 双侧面板布局 */
+.scan-panels {
+  display: flex;
+  gap: 0;
+  min-height: 240px;
+}
+
+.scan-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-panel-left {
+  border-right: 1px solid #f0f0f0;
+}
+
+.scan-panel-title {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.scan-panel-table {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 扫描清单表格 */
+.scan-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.scan-table thead th {
+  background: #fafafa;
+  font-weight: 600;
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e8e8e8;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.scan-table tbody td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.scan-table tbody tr:hover {
+  background: #e6f7ff;
+}
+
+.scan-material-name {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 12px;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== 关键件绑定弹窗 ========== */
+
+/* 扫描框 - 正在扫描零件时的激活态 */
+.scan-box.scan-active {
+  border-color: #1890ff;
+  background: #e6f7ff;
+}
+
+/* 部件信息展示 */
+.bind-component-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bind-comp-detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bind-comp-label {
+  font-size: 13px;
+  color: #999;
+}
+
+.bind-comp-val {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* 零件扫描进度栏 */
+.bind-parts-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #e6f7ff;
+}
+
+.bind-parts-header.bind-done {
+  background: #f6ffed;
+}
+
+.bind-parts-tip {
+  font-size: 14px;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.bind-parts-tip.done {
+  color: #52c41a;
+}
+
+/* 内嵌扫描线(小) */
+.scan-line-inline {
+  width: 4px;
+  height: 20px;
+  background: #ff4d4f;
+  border-radius: 2px;
+  animation: scanBlink 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes scanBlink {
+  0% { opacity: 0.3; transform: scaleY(0.6); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* 绑定明细表容器 */
+.bind-table-wrap {
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
