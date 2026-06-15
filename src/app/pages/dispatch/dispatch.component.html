@@ -30,11 +30,11 @@
 
 <!-- 表格 -->
 <div class="table-card">
-  <nz-table #dispatchTable [nzData]="listOfData"
+  <nz-table #dispatchTable [nzData]="groupedRows"
     nzSize="small"
     [nzBordered]="false"
     [nzShowPagination]="false"
-    [nzScroll]="{ x: '1200px', y: 'calc(100vh - 320px)' }">
+    style="max-height: calc(100vh - 320px); overflow-y: auto;">
 
     <thead>
       <tr>
@@ -55,29 +55,64 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let data of dispatchTable.data; let i = index">
-        <td nzLeft nzAlign="center">
-          <label nz-checkbox [(ngModel)]="data.checked"
-            [nzDisabled]="data.isMaterialReserved"
-            (ngModelChange)="onItemChecked(data.id, $event)"></label>
-        </td>
-        <td nzLeft nzAlign="center">{{ i + 1 }}</td>
-        <td><a style="color:#1890ff;">{{ data.dispatchNo }}</a></td>
-        <td><a style="color:#1890ff;">{{ data.directDispatchNo }}</a></td>
-        <td><a style="color:#1890ff;">{{ data.productionOrder }}</a></td>
-        <td>
-          <a style="color:#1890ff;">{{ data.worker }}</a>
-          <i class="anticon anticon-export" style="color:#1890ff;margin-left:4px;font-size:12px;"></i>
-        </td>
-        <td nzAlign="center">{{ data.quantity }}</td>
-        <td nzAlign="center">
-          <label nz-switch [(ngModel)]="data.scrapPending" nzCheckedChildren="已挂" nzUnCheckedChildren="已挂"></label>
-        </td>
-        <td nzAlign="center" [style.color]="data.statusColor">{{ data.status }}</td>
-        <td nzAlign="center">
-          <span [class.ys-tag]="data.isMaterialReserved" [class.ys-default]="!data.isMaterialReserved">{{ data.productionMode }}</span>
-        </td>
-      </tr>
+      <ng-container *ngFor="let group of dispatchTable.data">
+        <tr>
+          <td nzLeft nzAlign="center" style="position:relative;">
+            <!-- 多条记录时：展开按钮 -->
+            <button *ngIf="group.records.length > 1"
+              nz-button nzType="text" nzSize="small"
+              style="padding:0;min-width:20px;"
+              (click)="toggleExpand(group)">
+              <span [style.color]="group.expanded ? '#1890ff' : '#666'"
+                [style.transform]="'rotate(' + (group.expanded ? 90 : 0) + 'deg)'"
+                style="display:inline-block;font-size:10px;transition:transform 0.2s;">▶</span>
+            </button>
+            <!-- 单条记录或展开后子行用 checkbox -->
+            <label nz-checkbox *ngIf="group.records.length === 1"
+              [(ngModel)]="group.records[0].checked"
+              [nzDisabled]="group.records[0].isMaterialReserved"
+              (ngModelChange)="onItemChecked(group.records[0].id, $event)"></label>
+          </td>
+          <td nzLeft nzAlign="center">{{ group.index }}</td>
+          <td><a style="color:#1890ff;">{{ group.records[0].dispatchNo }}</a></td>
+          <td><a style="color:#1890ff;">{{ group.directDispatchNo }}</a></td>
+          <td><a style="color:#1890ff;">{{ group.records[0].productionOrder }}</a></td>
+          <td><a style="color:#1890ff;">{{ group.records[0].worker }}</a>
+            <i class="anticon anticon-export" style="color:#1890ff;margin-left:4px;font-size:12px;"></i>
+          </td>
+          <td nzAlign="center">{{ group.records[0].quantity }}</td>
+          <td nzAlign="center">
+            <label nz-switch [(ngModel)]="group.records[0].scrapPending" nzCheckedChildren="已挂" nzUnCheckedChildren="已挂"></label>
+          </td>
+          <td nzAlign="center" [style.color]="group.records[0].statusColor">{{ group.records[0].status }}</td>
+          <td nzAlign="center">
+            <span [class.ys-tag]="group.records[0].isMaterialReserved" [class.ys-default]="!group.records[0].isMaterialReserved">{{ group.records[0].productionMode }}</span>
+          </td>
+        </tr>
+
+        <!-- 展开子行 -->
+        <tr *ngIf="group.expanded && group.records.length > 1" style="background:#fafafa;">
+          <td nzLeft nzAlign="center"></td>
+          <td [attr.colspan]="9" style="padding:4px 16px;">
+            <div *ngFor="let record of group.records.slice(1)"
+              style="display:flex;align-items:center;padding:6px 0;border-bottom:1px dashed #eee;"
+              [style.border-bottom]="record === group.records[group.records.length - 1] ? 'none' : '1px dashed #eee'">
+              <label nz-checkbox [(ngModel)]="record.checked"
+                [nzDisabled]="record.isMaterialReserved"
+                (ngModelChange)="onItemChecked(record.id, $event)"></label>
+              <span style="width:50px;text-align:center;color:#999;">{{ group.index }}</span>
+              <a style="color:#1890ff;width:120px;">{{ record.dispatchNo }}</a>
+              <span style="width:140px;color:#999;"></span>
+              <a style="color:#1890ff;width:120px;">{{ record.productionOrder }}</a>
+              <a style="color:#1890ff;width:180px;">{{ record.worker }}</a>
+              <span style="width:60px;text-align:center;">{{ record.quantity }}</span>
+              <label nz-switch [(ngModel)]="record.scrapPending" nzCheckedChildren="已挂" nzUnCheckedChildren="已挂" style="margin-left:8px;"></label>
+              <span style="width:60px;text-align:center;" [style.color]="record.statusColor">{{ record.status }}</span>
+              <span [class.ys-tag]="record.isMaterialReserved" [class.ys-default]="!record.isMaterialReserved">{{ record.productionMode }}</span>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </nz-table>
 </div>
@@ -89,10 +124,10 @@
     <button nz-button size="small">更多</button>
   </div>
   <div class="footer-right">
-    共 1384 项
+    共 {{ listOfData.length }} 项
     <nz-pagination
       [nzPageIndex]="1"
-      [nzTotal]="1384"
+      [nzTotal]="listOfData.length"
       [nzPageSize]="50"
       nzSize="small"
       [nzShowSizeChanger]="true"

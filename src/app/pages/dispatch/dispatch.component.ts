@@ -15,6 +15,14 @@ interface DispatchRecord {
   checked?: boolean;
 }
 
+/** 按直接派工单号分组的行数据 */
+interface GroupedRow {
+  directDispatchNo: string;
+  records: DispatchRecord[];
+  expanded: boolean;
+  index: number;
+}
+
 @Component({
   selector: 'app-dispatch',
   templateUrl: './dispatch.component.html',
@@ -42,14 +50,43 @@ export class DispatchComponent {
     { id: 10, dispatchNo: '0000001965', directDispatchNo: '0000001890', productionOrder: '20000130757', worker: 'ADMIN_MES-MES系统管理员', quantity: 10, scrapPending: true, status: '完成', statusColor: '#52c41a', productionMode: '约料', isMaterialReserved: true }
   ];
 
+  /** 分组后的表格数据 */
+  groupedRows: GroupedRow[] = [];
+
+  ngOnInit(): void {
+    this.groupByDirectDispatchNo();
+  }
+
+  /** 按直接派工单号分组 */
+  private groupByDirectDispatchNo(): void {
+    const map = new Map<string, DispatchRecord[]>();
+    this.listOfData.forEach(item => {
+      if (!map.has(item.directDispatchNo)) map.set(item.directDispatchNo, []);
+      map.get(item.directDispatchNo)!.push(item);
+    });
+    let idx = 1;
+    this.groupedRows = Array.from(map.entries()).map(([directDispatchNo, records]) => ({
+      directDispatchNo,
+      records,
+      expanded: false,
+      index: idx++
+    }));
+  }
+
+  toggleExpand(row: GroupedRow): void {
+    row.expanded = !row.expanded;
+  }
+
   checked = false;
   indeterminate = false;
 
+  get allRecords(): DispatchRecord[] {
+    return this.groupedRows.flatMap(g => g.records);
+  }
+
   onAllChecked(checked: boolean): void {
-    this.listOfData.forEach(item => {
-      if (!item.isMaterialReserved) {
-        item.checked = checked;
-      }
+    this.allRecords.forEach(item => {
+      if (!item.isMaterialReserved) item.checked = checked;
     });
     this.refreshCheckedStatus();
   }
@@ -59,9 +96,9 @@ export class DispatchComponent {
   }
 
   refreshCheckedStatus(): void {
-    const selectable = this.listOfData.filter(item => !item.isMaterialReserved);
+    const selectable = this.allRecords.filter(item => !item.isMaterialReserved);
     const allChecked = selectable.every(item => item.checked);
-    const someChecked = this.listOfData.some(item => item.checked);
+    const someChecked = this.allRecords.some(item => item.checked);
     this.checked = allChecked;
     this.indeterminate = !allChecked && someChecked;
   }

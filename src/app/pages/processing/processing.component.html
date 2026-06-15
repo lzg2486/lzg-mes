@@ -1,4 +1,17 @@
-<!-- 顶部 -->
+<!-- 面包屑：单独一行 -->
+<div style="margin-bottom:12px;flex-shrink:0;">
+  <nz-breadcrumb [nzSeparator]="'/'" style="font-size:14px;">
+    <nz-breadcrumb-item>
+      <a *ngIf="detailMode" (click)="backToList()">生产加工</a>
+      <span *ngIf="!detailMode">生产加工</span>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item *ngIf="detailMode">
+      <span>派工单详情({{ currentDispatchNo }})</span>
+    </nz-breadcrumb-item>
+  </nz-breadcrumb>
+</div>
+
+<!-- 工具栏：布局 + 视图切换 + 右侧操作（面包屑下方，内容区域内） -->
 <div style="margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-shrink:0;">
   <nz-button-group>
     <button nz-button nzType="primary">
@@ -6,7 +19,6 @@
     </button>
   </nz-button-group>
 
-  <!-- 操作模式切换 -->
   <nz-radio-group [(ngModel)]="viewMode" nzButtonStyle="solid" style="margin-left:8px;">
     <label nz-radio-button nzValue="card"><i class="anticon anticon-table"></i> 卡片视图</label>
     <label nz-radio-button nzValue="process"><span style="font-weight:600;">生产加工</span></label>
@@ -16,131 +28,192 @@
   <i class="anticon anticon-down-circle-o" style="font-size:18px;color:#999;cursor:pointer;"></i>
 </div>
 
-<!-- 搜索栏 -->
-<div class="search-bar" style="flex-shrink:0;">
-  <div style="display:flex;align-items:center;gap:12px;">
-    <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
-    <span>生产订单：</span>
-    <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
-    <span style="margin-left:8px;">物料号：</span>
-    <input nz-input placeholder="物料号" [(ngModel)]="searchMaterialNo" style="width:180px;" />
-    <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
+<!-- ========== 第一级：派工单列表 ========== -->
+<ng-container *ngIf="!detailMode">
+
+  <!-- 搜索栏 -->
+  <div class="search-bar" style="flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
+      <span>生产订单：</span>
+      <input nz-input placeholder="生产订单（批量、模糊）" [(ngModel)]="searchOrderNo" style="width:220px;" />
+      <span style="margin-left:8px;">物料号：</span>
+      <input nz-input placeholder="物料号" [(ngModel)]="searchMaterialNo" style="width:180px;" />
+      <button nz-button nzType="primary"><i class="anticon anticon-search"></i> 搜索</button>
+    </div>
   </div>
-</div>
 
-<!-- 表格 -->
-<div class="table-card">
-  <nz-table #procTable [nzData]="listOfData"
-    nzSize="small"
-    [nzBordered]="false"
-    [nzShowPagination]="false"
-    [nzScroll]="{ x: '1200px', y: 'calc(100vh - 280px)' }">
+  <!-- 表格 -->
+  <div class="table-card">
+    <nz-table #procTable [nzData]="dispatchSummaries"
+      nzSize="small"
+      [nzBordered]="false"
+      [nzShowPagination]="false"
+      [nzScroll]="{ x: '900px', y: 'calc(100vh - 210px)' }">
 
-    <thead>
-      <tr>
-        <th nzLeft nzWidth="60px" nzAlign="center">
-          <label nz-checkbox [(ngModel)]="checked"
-            [nzIndeterminate]="indeterminate"
-            (ngModelChange)="onAllChecked($event)"></label>
-        </th>
-        <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
-        <th nzWidth="140px">派工单编号 <sup style="color:#ff4d4f;">7</sup> <i class="anticon anticon-arrow-down"></i></th>
-        <th nzWidth="140px">工单编号 <i class="anticon anticon-arrow-down"></i></th>
-        <th nzWidth="80px">工序</th>
-        <th nzWidth="130px">实动定额百分比</th>
-        <th nzWidth="180px">物料描述</th>
-        <th nzWidth="80px" nzAlign="center">生产模式</th>
-        <th nzWidth="80px">顺序编号 <i class="anticon anticon-arrow-down"></i></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of procTable.data; let i = index">
-        <td nzLeft nzAlign="center">
-          <label nz-checkbox [(ngModel)]="data.checked"
-            (ngModelChange)="onItemChecked(data.id, $event)"></label>
-        </td>
-        <td nzLeft nzAlign="center">{{ i + 1 }}</td>
-        <td>
-          <a *ngIf="data.isMaterialReserved" style="color:#1890ff;cursor:pointer;" (click)="openDispatchDetail(data)">{{ data.dispatchNo }}</a>
-          <span *ngIf="!data.isMaterialReserved">{{ data.dispatchNo }}</span>
-        </td>
-        <td><a style="color:#1890ff;">{{ data.workNo }}</a></td>
-        <td>{{ data.processCode }}</td>
-        <td>
-          <div *ngIf="getProgressValue(data.actualPercent) > 0">
-            <nz-progress
-              [nzPercent]="getProgressValue(data.actualPercent)"
-              [nzStrokeWidth]="6"
-              [nzSize]="'small'"
-              [nzStatus]="'active'"
-              [nzShowInfo]="false">
-            </nz-progress>
-          </div>
-          <span *ngIf="getProgressValue(data.actualPercent) === 0">{{ data.actualPercent }}</span>
-        </td>
-        <td>{{ data.materialDesc }}</td>
-        <td nzAlign="center">
-          <span [class.ys-tag]="data.isMaterialReserved" [class.ys-default]="!data.isMaterialReserved">{{ data.productionMode }}</span>
-        </td>
-        <td>{{ data.seqNo }}</td>
-      </tr>
-    </tbody>
-  </nz-table>
-</div>
+      <thead>
+        <tr>
+          <th nzLeft nzWidth="60px" nzAlign="center">
+            <label nz-checkbox [(ngModel)]="checked"
+              [nzIndeterminate]="indeterminate"
+              (ngModelChange)="onAllChecked($event)"></label>
+          </th>
+          <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
+          <th nzWidth="160px">派工单编号 <sup style="color:#ff4d4f;">{{ dispatchSummaries.length }}</sup> <i class="anticon anticon-arrow-down"></i></th>
+          <th nzWidth="80px" nzAlign="center">工单数</th>
+          <th nzWidth="200px">物料描述</th>
+          <th nzWidth="80px" nzAlign="center">生产模式</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let summary of procTable.data; let i = index">
+          <td nzLeft nzAlign="center">
+            <label nz-checkbox [(ngModel)]="summary.records[0].checked"
+              (ngModelChange)="onItemChecked(summary.records[0].id, $event)"></label>
+          </td>
+          <td nzLeft nzAlign="center">{{ i + 1 }}</td>
+          <td>
+            <a *ngIf="summary.isMaterialReserved" style="color:#1890ff;cursor:pointer;" (click)="enterDispatchDetail(summary)">{{ summary.dispatchNo }}</a>
+            <span *ngIf="!summary.isMaterialReserved">{{ summary.dispatchNo }}</span>
+          </td>
+          <td nzAlign="center">{{ summary.count }}</td>
+          <td>{{ summary.materialDesc }}</td>
+          <td nzAlign="center">
+            <span [class.ys-tag]="summary.isMaterialReserved" [class.ys-default]="!summary.isMaterialReserved">{{ summary.productionMode }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
 
-<!-- 工单明细弹窗（约料订单点击派工单号） -->
-<nz-modal
-  [(nzVisible)]="dispatchDetailVisible"
-  [nzTitle]="'工单明细 - ' + (currentDispatchItem?.dispatchNo || '')"
-  [nzFooter]="null"
-  [nzWidth]="800"
-  [nzBodyStyle]="{ padding: '0', maxHeight: '70vh', overflow: 'auto' }"
-  (nzOnCancel)="dispatchDetailVisible = false">
-  <ng-container *nzModalContent>
-    <!-- 信息栏 -->
-    <div class="detail-info-bar">
-      <div class="info-row">
-        <span class="info-item"><b>派工单号：</b>{{ currentDispatchItem?.dispatchNo }}</span>
-        <span class="info-item"><b>生产模式：</b>{{ currentDispatchItem?.productionMode }}</span>
-        <span class="info-item" *ngIf="currentDispatchItem"><b>工作中心：</b>{{ currentDispatchItem.workCenter }}</span>
-      </div>
+  <!-- 底部操作+分页栏 -->
+  <div class="page-footer">
+    <div class="footer-left">
+      <button nz-button nzType="primary" size="small" (click)="openScanReceipt()">点收开工</button>
+      <button nz-button nzType="primary" size="small" (click)="openBindKeyPart()">关键件绑定</button>
+      <button nz-button nzType="primary" size="small">开工</button>
+      <button nz-button size="small">暂停</button>
+      <button nz-button size="small">等工</button>
+      <button nz-button size="small">完成</button>
+      <button nz-button size="small">更多</button>
     </div>
-    <!-- 明细表格 -->
-    <div class="detail-table-wrap">
-      <nz-table #detailTable [nzData]="dispatchDetailRows"
+    <div class="footer-right">
+      共 {{ dispatchSummaries.length }} 项
+      <nz-pagination
+        [nzPageIndex]="1"
+        [nzTotal]="dispatchSummaries.length"
+        [nzPageSize]="50"
         nzSize="small"
-        [nzBordered]="false"
-        [nzFrontPagination]="true"
-        [nzPageSize]="20"
-        [nzTotal]="dispatchDetailRows.length"
         [nzShowSizeChanger]="true"
-        [nzPageSizeOptions]="[10, 20, 50]">
-        <thead>
-          <tr>
-            <th width="50px" align="center">#</th>
-            <th width="140px">工单编号</th>
-            <th width="80px">工序</th>
-            <th width="110px">实动定额百分比</th>
-            <th width="160px">物料描述</th>
-            <th width="100px">工作中心</th>
-            <th width="80px" align="right">数量</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let row of detailTable.data; let i = index">
-            <td align="center">{{ i + 1 }}</td>
-            <td><a style="color:#1890ff;">{{ row.workNo }}</a></td>
-            <td>{{ row.processCode }}</td>
-            <td>{{ row.actualPercent }}</td>
-            <td>{{ row.materialDesc }}</td>
-            <td>{{ row.workCenter }}</td>
-            <td align="right">{{ row.quantity }}</td>
-          </tr>
-        </tbody>
-      </nz-table>
+        [nzShowQuickJumper]="true">
+      </nz-pagination>
     </div>
-  </ng-container>
-</nz-modal>
+  </div>
+
+</ng-container>
+
+<!-- ========== 第二级：派工单详情（面包屑） ========== -->
+<ng-container *ngIf="detailMode">
+
+  <!-- 搜索栏（详情页专用） -->
+  <div class="search-bar" style="flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <i class="anticon anticon-search-circle-o" style="color:#1890ff;font-size:18px;margin-right:4px;"></i>
+      <span>工单编号：</span>
+      <input nz-input placeholder="工单编号" [(ngModel)]="detailSearchWorkNo" style="width:180px;" />
+      <span style="margin-left:8px;">工序：</span>
+      <input nz-input placeholder="工序" [(ngModel)]="detailSearchProcessCode" style="width:140px;" />
+      <button nz-button nzType="primary" (click)="searchDetails()"><i class="anticon anticon-search"></i> 搜索</button>
+    </div>
+  </div>
+
+  <!-- 派工单信息摘要条 -->
+  <div class="detail-summary-bar" style="flex-shrink:0;">
+    <span class="detail-summary-item"><b>派工单号：</b>{{ currentDispatchNo }}</span>
+    <span class="detail-summary-item"><b>物料描述：</b>{{ currentSummary?.materialDesc }}</span>
+    <span class="detail-summary-item"><b>生产模式：</b>{{ currentSummary?.productionMode }}</span>
+    <span class="detail-summary-item"><b>工单数：</b>{{ detailTotalCount }}</span>
+  </div>
+
+  <!-- 工单明细表格 -->
+  <div class="table-card">
+    <nz-table #detailTable [nzData]="filteredDetailRows"
+      nzSize="small"
+      [nzBordered]="false"
+      [nzShowPagination]="false"
+      [nzScroll]="{ x: '1500px', y: 'calc(100vh - 260px)' }">
+
+      <thead>
+        <tr>
+          <th nzLeft nzWidth="60px" nzAlign="center">序号</th>
+          <th nzWidth="150px">工单编号 <i class="anticon anticon-arrow-down"></i></th>
+          <th nzWidth="130px">订单号</th>
+          <th nzWidth="100px">部件号</th>
+          <th nzWidth="80px">工序</th>
+          <th nzWidth="140px">实动定额百分比</th>
+          <th nzWidth="200px">物料描述</th>
+          <th nzWidth="100px">工作中心</th>
+          <th nzWidth="80px" nzAlign="center">顺序编号 <i class="anticon anticon-arrow-down"></i></th>
+          <th nzWidth="180px" nzAlign="center">操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of detailTable.data; let i = index">
+          <td nzLeft nzAlign="center">{{ i + 1 }}</td>
+          <td><a style="color:#1890ff;">{{ row.workNo }}</a></td>
+          <td>{{ row.orderNo }}</td>
+          <td>{{ row.partNo }}</td>
+          <td>{{ row.processCode }}</td>
+          <td>
+            <div *ngIf="getProgressValue(row.actualPercent) > 0">
+              <nz-progress
+                [nzPercent]="getProgressValue(row.actualPercent)"
+                [nzStrokeWidth]="6"
+                [nzSize]="'small'"
+                [nzStatus]="'active'"
+                [nzShowInfo]="false">
+              </nz-progress>
+            </div>
+            <span *ngIf="getProgressValue(row.actualPercent) === 0">{{ row.actualPercent }}</span>
+          </td>
+          <td>{{ row.materialDesc }}</td>
+          <td>{{ row.workCenter }}</td>
+          <td nzAlign="center">0</td>
+          <td nzAlign="center">
+            <button nz-button nzType="primary" size="small">开工</button>
+            <button nz-button size="small">暂停</button>
+            <button nz-button size="small">完工</button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+
+  <!-- 底部分页栏（详情页隐藏操作按钮） -->
+  <div class="page-footer">
+    <div class="footer-left" *ngIf="!detailMode">
+      <button nz-button nzType="primary" size="small" (click)="openScanReceipt()">点收开工</button>
+      <button nz-button nzType="primary" size="small" (click)="openBindKeyPart()">关键件绑定</button>
+      <button nz-button nzType="primary" size="small">开工</button>
+      <button nz-button size="small">暂停</button>
+      <button nz-button size="small">等工</button>
+      <button nz-button size="small">完成</button>
+      <button nz-button size="small">更多</button>
+    </div>
+    <div class="footer-right">
+      共 {{ filteredDetailRows.length }} 项
+      <nz-pagination
+        [nzPageIndex]="1"
+        [nzTotal]="filteredDetailRows.length"
+        [nzPageSize]="50"
+        nzSize="small"
+        [nzShowSizeChanger]="true"
+        [nzShowQuickJumper]="true">
+      </nz-pagination>
+    </div>
+  </div>
+
+</ng-container>
 
 <!-- 点收开工弹窗 -->
 <nz-modal
@@ -154,12 +227,10 @@
     <!-- 扫描区域 -->
     <div class="scan-area">
       <div class="scan-box" [class.scan-done]="scanStage === 'result'">
-        <!-- 未扫描时横线上下扫动 -->
         <ng-container *ngIf="scanStage === 'scanning'">
           <div class="scan-line"></div>
           <div class="scan-bg-text">将纸质单上预制派工单号正对扫码器</div>
         </ng-container>
-        <!-- 扫描完成后显示结果 -->
         <ng-container *ngIf="scanStage === 'result'">
           <div class="scan-result">
             <i class="anticon anticon-check-circle" style="color:#52c41a;font-size:32px;"></i>
@@ -170,7 +241,6 @@
       </div>
     </div>
 
-    <!-- 结果面板：仅在扫描完成后显示 -->
     <ng-container *ngIf="scanStage === 'result'">
       <div class="scan-info-bar">
         <div class="info-row">
@@ -180,9 +250,7 @@
         </div>
       </div>
 
-      <!-- 左右双侧清单 -->
       <div class="scan-panels">
-        <!-- 左侧：物料点收清单 -->
         <div class="scan-panel scan-panel-left">
           <div class="scan-panel-title">物料点收清单</div>
           <div class="scan-panel-table">
@@ -218,7 +286,6 @@
           </div>
         </div>
 
-        <!-- 右侧：工单开工清单 -->
         <div class="scan-panel scan-panel-right">
           <div class="scan-panel-title">工单开工清单</div>
           <div class="scan-panel-table">
@@ -268,17 +335,14 @@
   (nzOnCancel)="closeBind()">
   <ng-container *nzModalContent>
 
-    <!-- 扫描区域 -->
     <div class="scan-area">
       <div class="scan-box"
         [class.scan-done]="bindStage === 'componentDone' || bindStage === 'scanningParts' || bindStage === 'done'"
         [class.scan-active]="bindStage === 'scanningParts'">
-        <!-- 扫描部件序列号 -->
         <ng-container *ngIf="bindStage === 'scanComponent'">
           <div class="scan-line"></div>
           <div class="scan-bg-text">将部件序列号条形码正对扫码器</div>
         </ng-container>
-        <!-- 部件扫描完成 -->
         <ng-container *ngIf="bindStage === 'componentDone' || bindStage === 'scanningParts' || bindStage === 'done'">
           <div class="bind-component-info">
             <i class="anticon anticon-check-circle" style="color:#52c41a;font-size:32px;"></i>
@@ -296,7 +360,6 @@
       </div>
     </div>
 
-    <!-- 零件扫描阶段：显示扫描提示 -->
     <ng-container *ngIf="bindStage === 'scanningParts' || bindStage === 'done'">
       <div class="bind-parts-header" [class.bind-done]="bindStage === 'done'">
         <ng-container *ngIf="bindStage === 'scanningParts'">
@@ -310,7 +373,6 @@
       </div>
     </ng-container>
 
-    <!-- 零件绑定明细表 -->
     <ng-container *ngIf="bindPartItems.length > 0">
       <div class="bind-table-wrap">
         <table class="scan-table">
@@ -340,7 +402,6 @@
       </div>
     </ng-container>
 
-    <!-- 扫描完成后显示操作按钮 -->
     <div class="bind-footer" *ngIf="bindStage === 'done'">
       <button nz-button nzType="default" (click)="closeBind()">取消</button>
       <button nz-button nzType="primary">确认</button>
@@ -348,27 +409,3 @@
 
   </ng-container>
 </nz-modal>
-
-<!-- 底部操作+分页栏 -->
-<div class="page-footer">
-  <div class="footer-left">
-    <button nz-button nzType="primary" size="small" (click)="openScanReceipt()">点收开工</button>
-    <button nz-button nzType="primary" size="small" (click)="openBindKeyPart()">关键件绑定</button>
-    <button nz-button nzType="primary" size="small">开工</button>
-    <button nz-button size="small">暂停</button>
-    <button nz-button size="small">等工</button>
-    <button nz-button size="small">完成</button>
-    <button nz-button size="small">更多</button>
-  </div>
-  <div class="footer-right">
-    共 52 项
-    <nz-pagination
-      [nzPageIndex]="1"
-      [nzTotal]="52"
-      [nzPageSize]="50"
-      nzSize="small"
-      [nzShowSizeChanger]="true"
-      [nzShowQuickJumper]="true">
-    </nz-pagination>
-  </div>
-</div>

@@ -1,20 +1,28 @@
 /* 撑满父容器 */
-:host {
+::host {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
 }
 
-/* 表格撑满剩余空间 */
-:host ::ng-deep .ant-table-wrapper {
+/* 表格容器：撑满剩余空间，footer 固定在底部 */
+.table-card {
   flex: 1;
   min-height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-:host ::ng-deep .ant-table {
+
+::host ::ng-deep .table-card .ant-table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+::host ::ng-deep .table-card .ant-table {
   flex: 1;
   min-height: 0;
 }
@@ -31,15 +39,15 @@
 }
 .footer-left { display: flex; gap: 8px; }
 .footer-right { font-size: 13px; color: #666; display: flex; align-items: center; }
-:host ::ng-deep .page-footer .ant-pagination { margin-left: 12px; }
+::host ::ng-deep .page-footer .ant-pagination { margin-left: 12px; }
 
 /* 固定列背景色 */
-:host ::ng-deep .ant-table-cell-fix-left,
-:host ::ng-deep .ant-table-cell-fix-right {
+::host ::ng-deep .ant-table-cell-fix-left,
+::host ::ng-deep .ant-table-cell-fix-right {
   background: #fff;
 }
-:host ::ng-deep .ant-table-thead .ant-table-cell-fix-left,
-:host ::ng-deep .ant-table-thead .ant-table-cell-fix-right {
+::host ::ng-deep .ant-table-thead .ant-table-cell-fix-left,
+::host ::ng-deep .ant-table-thead .ant-table-cell-fix-right {
   background: #fafafa;
 }
 
@@ -57,41 +65,23 @@
   color: #bbb;
 }
 
-/* ========== 工单明细弹窗 ========== */
-.detail-info-bar {
-  padding: 14px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
-}
-.info-row {
+/* ========== 详情页信息摘要条 ========== */
+.detail-summary-bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px 28px;
   align-items: center;
+  gap: 24px;
+  padding: 10px 20px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
 }
-.info-item {
+.detail-summary-item {
   font-size: 13px;
   color: #333;
   white-space: nowrap;
 }
-.info-item b {
+.detail-summary-item b {
   color: #666;
   font-weight: 500;
-}
-
-.detail-table-wrap {
-  padding: 0;
-}
-
-/* 弹窗表格样式 */
-::host ::ng-deep nz-modal .detail-table-wrap .ant-table-thead > tr > th {
-  background: #fafafa;
-  font-weight: 600;
-  font-size: 12.5px;
-  color: #555;
-}
-::host ::ng-deep nz-modal .detail-table-wrap .ant-table-tbody > tr:hover > td {
-  background: #e6f7ff;
 }
 
 /* ========== 点收开工弹窗 ========== */
@@ -117,7 +107,6 @@
   overflow: hidden;
 }
 
-/* 扫描横线动画 */
 .scan-line {
   position: absolute;
   left: 0;
@@ -140,7 +129,6 @@
   z-index: 1;
 }
 
-/* 扫描完成状态 */
 .scan-box.scan-done {
   border-color: #52c41a;
   background: #f6ffed;
@@ -166,14 +154,30 @@
   letter-spacing: 1px;
 }
 
-/* 结果信息栏 */
 .scan-info-bar {
   padding: 12px 20px;
   border-bottom: 1px solid #f0f0f0;
   background: #fafafa;
 }
 
-/* 双侧面板布局 */
+.info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  align-items: center;
+}
+
+.info-item {
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+}
+
+.info-item b {
+  color: #666;
+  font-weight: 500;
+}
+
 .scan-panels {
   display: flex;
   gap: 0;
@@ -204,7 +208,6 @@
   overflow-y: auto;
 }
 
-/* 扫描清单表格 */
 .scan-table {
   width: 100%;
   border-collapse: collapse;
@@ -243,13 +246,11 @@
 
 /* ========== 关键件绑定弹窗 ========== */
 
-/* 扫描框 - 正在扫描零件时的激活态 */
 .scan-box.scan-active {
   border-color: #1890ff;
   background: #e6f7ff;
 }
 
-/* 部件信息展示 */
 .bind-component-info {
   display: flex;
   flex-direction: column;
@@ -275,7 +276,6 @@
   letter-spacing: 0.5px;
 }
 
-/* 零件扫描进度栏 */
 .bind-parts-header {
   display: flex;
   align-items: center;
@@ -300,7 +300,6 @@
   color: #52c41a;
 }
 
-/* 内嵌扫描线(小) */
 .scan-line-inline {
   width: 4px;
   height: 20px;
@@ -314,14 +313,12 @@
   100% { opacity: 1; transform: scaleY(1); }
 }
 
-/* 绑定明细表容器 */
 .bind-table-wrap {
   padding: 0;
   max-height: 280px;
   overflow-y: auto;
 }
 
-/* 关键件绑定底部按钮 */
 .bind-footer {
   display: flex;
   justify-content: center;
