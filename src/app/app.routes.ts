@@ -6,6 +6,7 @@ import { DispatchComponent } from './pages/dispatch/dispatch.component';
 import { ProcessingComponent } from './pages/processing/processing.component';
 import { DispatchAssignComponent } from './pages/dispatch-assign/dispatch-assign.component';
 import { ReviewComponent } from './pages/review/review.component';
+import { WorkOrderDispatchComponent } from './pages/work-order-dispatch/work-order-dispatch.component';
 
 export const routes: Routes = [
   { path: '', component: ProductionOrderComponent },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'processing', component: ProcessingComponent },
   { path: 'review', component: ReviewComponent },
   { path: 'dispatch-assign', component: DispatchAssignComponent },
+  { path: 'work-order-dispatch', component: WorkOrderDispatchComponent },
 ];

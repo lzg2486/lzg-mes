@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
     { label: '生产订单', route: '/' },
     { label: '约料管理', route: '/material-dispatch' },
     { label: '工单生成', route: '/work-order' },
+    { label: '工单派工', route: '/work-order-dispatch' },
     { label: '派工管理', route: '/dispatch' },
     { label: '生产加工', route: '/processing' },
     { label: '工时审核', route: '/review' },

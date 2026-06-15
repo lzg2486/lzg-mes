@@ -407,6 +407,7 @@
 
 .link-delete { color: #cf1322; cursor: pointer; font-size: 12.5px; }
 .link-delete:hover { text-decoration: underline; }
+.link-delete-disabled { color: #d9d9d9; cursor: not-allowed; font-size: 12.5px; }
 
 .empty-tip {
   text-align: center; padding: 60px 0; color: #ccc; font-size: 14px;

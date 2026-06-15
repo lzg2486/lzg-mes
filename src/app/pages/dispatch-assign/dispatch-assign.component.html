@@ -114,7 +114,11 @@
               </td>
               <td class="col-wcname">{{ row.workCenterLabel }}</td>
               <td class="col-predispatch"><span class="predispatch-no">{{ row.dispatchNo }}</span></td>
-              <td class="col-dispatch"><span class="dispatch-no" [title]="row.workOrderNo">{{ row.workOrderNo }}</span></td>
+              <td class="col-dispatch">
+                <div style="line-height:1.8;">
+                  <span class="dispatch-no" [title]="workOrderNo" *ngFor="let workOrderNo of row.workOrderNos">{{ workOrderNo }}</span>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -241,7 +245,7 @@
                 <label [class]="'prio-tag prio-' + row.priority" (click)="_togglePriority(row)">{{ _priorityText(row.priority) }}</label>
               </td>
               <td>
-                <a (click)="_removeBackupRow(row.id)" class="link-delete">删除</a>
+                <span class="link-delete-disabled">删除</span>
               </td>
             </tr>
           </tbody>

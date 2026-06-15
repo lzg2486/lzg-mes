@@ -11,6 +11,7 @@ import { DispatchComponent } from './pages/dispatch/dispatch.component';
 import { ProcessingComponent } from './pages/processing/processing.component';
 import { ReviewComponent } from './pages/review/review.component';
 import { DispatchAssignComponent } from './pages/dispatch-assign/dispatch-assign.component';
+import { WorkOrderDispatchComponent } from './pages/work-order-dispatch/work-order-dispatch.component';
 import { routes } from './app.routes';
 
 @NgModule({
@@ -23,6 +24,7 @@ import { routes } from './app.routes';
     ProcessingComponent,
     ReviewComponent,
     DispatchAssignComponent,
+    WorkOrderDispatchComponent,
   ],
   imports: [
     BrowserModule,

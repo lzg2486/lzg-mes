@@ -28,7 +28,7 @@ export interface WorkOrderDisplayRow {
   workCenterLabel: string;
   productionCount: number;
   qualityCheck: boolean;
-  workOrderNo: string;       // 工单号
+  workOrderNos: string[];    // 工单号列表
   orderNo: string;
   partCode: string;
   wbs: string;
@@ -124,7 +124,6 @@ export class DispatchAssignComponent {
 
     const result: WorkOrderDisplayRow[] = [];
     let idCounter = Date.now();
-    let workOrderSeq = 0;
 
     let parentItems = this.rows.filter(r => r.checked);
     if (this.selectedDispatchFilter) {
@@ -133,35 +132,31 @@ export class DispatchAssignComponent {
 
     for (const item of parentItems) {
       const deduped = this._getDedupedDetailRows(item);
-      for (let i = 0; i < deduped.length; i++) {
-        const d = deduped[i];
-        const newId = ++idCounter;
-        // 尝试复用旧行的用户编辑状态
-        const oldRow = [...oldMap.values()].find(old =>
-          old.parentId === item.id &&
-          old.orderNo === d.orderNo &&
-          old.partCode === d.partCode &&
-          old.wbs === d.wbs &&
-          old.processNo === d.processNo
-        );
-        result.push({
-          id: newId,
-          parentId: item.id,
-          checked: oldRow ? oldRow.checked : true,
-          dispatchNo: item.dispatchNo,
-          workCenterId: oldRow ? oldRow.workCenterId : item.workCenterId,
-          workCenterName: oldRow ? oldRow.workCenterName : item.workCenterName,
-          workCenterLabel: oldRow ? oldRow.workCenterLabel : (item.workCenterLabel || '-'),
-          productionCount: oldRow ? oldRow.productionCount : item.productionCount,
-          qualityCheck: oldRow ? oldRow.qualityCheck : item.qualityCheck,
-          workOrderNo: `20000130${String(750 + ++workOrderSeq).padStart(3, '0')}`,
-          orderNo: d.orderNo,
-          partCode: d.partCode,
-          wbs: d.wbs,
-          processNo: d.processNo,
-          quantity: d.quantity,
-        });
-      }
+      // 为该父级行生成工单号列表
+      const workOrderNos: string[] = deduped.map((d, i) => `20000130${String(750 + i + 1).padStart(3, '0')}`);
+      
+      const newId = ++idCounter;
+      // 尝试复用旧行的用户编辑状态
+      const oldRow = [...oldMap.values()].find(old =>
+        old.parentId === item.id
+      );
+      result.push({
+        id: newId,
+        parentId: item.id,
+        checked: oldRow ? oldRow.checked : true,
+        dispatchNo: item.dispatchNo,
+        workCenterId: oldRow ? oldRow.workCenterId : item.workCenterId,
+        workCenterName: oldRow ? oldRow.workCenterName : item.workCenterName,
+        workCenterLabel: oldRow ? oldRow.workCenterLabel : (item.workCenterLabel || '-'),
+        productionCount: oldRow ? oldRow.productionCount : item.productionCount,
+        qualityCheck: oldRow ? oldRow.qualityCheck : item.qualityCheck,
+        workOrderNos: workOrderNos,
+        orderNo: deduped[0]?.orderNo || '',
+        partCode: item.partCode,
+        wbs: item.wbs,
+        processNo: item.processNo,
+        quantity: deduped.reduce((sum, d) => sum + d.quantity, 0),
+      });
     }
     this._displayRows = result;
   }
