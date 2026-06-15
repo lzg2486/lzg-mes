@@ -115,17 +115,17 @@ export class MaterialDispatchComponent {
   // 表格数据
   listOfData: MaterialDispatch[] = [
     { id: 1, dispatchNo: '2000YPG26032500007', partCode: '21BAH2660000', demandDate: '2026-03-31', confirmDate: null, wbs: '-', processNo: '0060', workCenter: 'X2D06', sortString: '-', productionCount: 1, componentCount: 6, keyComponentCount: 0, componentArrived: 0, componentRate: 0.00, status: 'pending_issue' },
-    { id: 2, dispatchNo: '2000YPG26041300001', partCode: '21BAH2660002', demandDate: '2026-05-10', confirmDate: '2026-05-11', wbs: 'K181B', processNo: '0050', workCenter: 'X2D05', sortString: 'E-E02-BAH', productionCount: 2, componentCount: 10, keyComponentCount: 3, componentArrived: 7, componentRate: 70.00, status: 'pending_dispatch' },
+    { id: 2, dispatchNo: '2000YPG26041300001', partCode: '21BAH2660002', demandDate: '2026-05-10', confirmDate: '2026-05-11', wbs: 'K181B', processNo: '0050', workCenter: 'X2D05', sortString: 'E-E02-BAH', productionCount: 2, componentCount: 10, keyComponentCount: 3, componentArrived: 9, componentRate: 90.00, status: 'pending_dispatch' },
     { id: 3, dispatchNo: '2000YPG26032500006', partCode: '21BAH2660000', demandDate: '2026-03-31', confirmDate: null, wbs: '-', processNo: '0010', workCenter: 'X2D02', sortString: 'A-A07-BAH', productionCount: 1, componentCount: 5, keyComponentCount: 0, componentArrived: 2, componentRate: 40.00, status: 'pending_issue' },
     { id: 4, dispatchNo: '2000YPG26012700010', partCode: 'ZB417K1772SH', demandDate: '', confirmDate: null, wbs: 'K177Z', processNo: '0010', workCenter: 'D4', sortString: '-', productionCount: 1, componentCount: 534, keyComponentCount: 0, componentArrived: 534, componentRate: 100.00, status: 'pending_confirm' },
     { id: 5, dispatchNo: '2000YPG26012700009', partCode: '72BAH220001016', demandDate: '', confirmDate: null, wbs: '20311', processNo: '0010', workCenter: 'X2B11', sortString: '-', productionCount: 1, componentCount: 2, keyComponentCount: 0, componentArrived: 1, componentRate: 50.00, status: 'dispatched_material' },
     { id: 6, dispatchNo: '2000YPG25072900010', partCode: '21BAH2660000', demandDate: '', confirmDate: null, wbs: 'Z-2000_20336ZJ01', processNo: '0070', workCenter: 'X2D01', sortString: '-', productionCount: 1, componentCount: 3, keyComponentCount: 0, componentArrived: 3, componentRate: 100.00, status: 'dispatched' },
-    { id: 7, dispatchNo: '2000YPG25072800008', partCode: '21BCH5400001', demandDate: '2026-04-15', confirmDate: null, wbs: '-', processNo: '0060', workCenter: 'X2D06', sortString: 'B-B03-BCH', productionCount: 2, componentCount: 12, keyComponentCount: 2, componentArrived: 5, componentRate: 41.67, status: 'pending_issue' },
+    { id: 7, dispatchNo: '2000YPG25072800008', partCode: '21BCH5400001', demandDate: '2026-04-15', confirmDate: '2026-04-18', wbs: '-', processNo: '0060', workCenter: 'X2D06', sortString: 'B-B03-BCH', productionCount: 2, componentCount: 12, keyComponentCount: 2, componentArrived: 10, componentRate: 83.33, status: 'dispatched_material' },
     { id: 8, dispatchNo: '2000YPG26041500003', partCode: '21BBG4320000', demandDate: '2026-04-20', confirmDate: '2026-04-21', wbs: 'K182C', processNo: '0050', workCenter: 'X2D05', sortString: 'E-E08-BBG', productionCount: 2, componentCount: 8, keyComponentCount: 2, componentArrived: 8, componentRate: 100.00, status: 'pending_dispatch' },
     { id: 9, dispatchNo: '2000YPG26032800005', partCode: '21BBG4320001', demandDate: '2026-04-10', confirmDate: null, wbs: 'K180A', processNo: '0020', workCenter: 'X2D03', sortString: 'C-C05-BBG', productionCount: 1, componentCount: 8, keyComponentCount: 1, componentArrived: 8, componentRate: 100.00, status: 'pending_confirm' },
     { id: 10, dispatchNo: '2000YPG26012600004', partCode: '21BBH5700002', demandDate: '', confirmDate: null, wbs: '20400', processNo: '0030', workCenter: 'D6', sortString: '-', productionCount: 3, componentCount: 120, keyComponentCount: 3, componentArrived: 120, componentRate: 100.00, status: 'pending_dispatch' },
     { id: 11, dispatchNo: '2000YPG25072700003', partCode: '21BAH2660001', demandDate: '2026-05-01', confirmDate: null, wbs: '-', processNo: '0040', workCenter: 'X2B12', sortString: 'D-D07-BAH', productionCount: 1, componentCount: 15, keyComponentCount: 0, componentArrived: 7, componentRate: 46.67, status: 'pending_delivery' },
-    { id: 12, dispatchNo: '2000YPG26032900002', partCode: 'ZB417K1773SH', demandDate: '', confirmDate: null, wbs: 'Z-2001_20337ZK02', processNo: '0010', workCenter: 'D4', sortString: '-', productionCount: 1, componentCount: 42, keyComponentCount: 1, componentArrived: 0, componentRate: 0.00, status: 'pending_issue' },
+    { id: 12, dispatchNo: '2000YPG26032900002', partCode: 'ZB417K1773SH', demandDate: '', confirmDate: '2026-05-20', wbs: 'Z-2001_20337ZK02', processNo: '0010', workCenter: 'D4', sortString: '-', productionCount: 1, componentCount: 42, keyComponentCount: 1, componentArrived: 37, componentRate: 88.10, status: 'dispatched_material' },
   ];
 
   checked = false;
@@ -159,12 +159,20 @@ export class MaterialDispatchComponent {
         this.message.warning('混合状态无法进行操作，请选择相同状态的记录。');
         return;
       }
-      // 待派工到位率低于80%自动提示
-      if (firstStatus === 'pending_dispatch') {
+      // 已发料到位率低于80%自动提示（无法生成工单）
+      if (firstStatus === 'dispatched_material') {
         const below80 = items.filter(item => item.componentRate < 80);
         if (below80.length > 0) {
           const names = below80.map(item => item.dispatchNo).join('、');
-          this.message.warning(`${names} 部件到位率低于80%，无法一键派工。`);
+          this.message.warning(`${names} 组件到位率低于80%，无法生成生产工单。`);
+        }
+      }
+      // 待派工到位率低于100%自动提示（无法一键派工）
+      if (firstStatus === 'pending_dispatch') {
+        const below100 = items.filter(item => item.componentRate < 100);
+        if (below100.length > 0) {
+          const names = below100.map(item => item.dispatchNo).join('、');
+          this.message.warning(`${names} 组件到位率未达100%，无法一键派工。`);
         }
       }
     }
@@ -210,9 +218,10 @@ export class MaterialDispatchComponent {
       case 'pending_delivery':
         return '仓库发料';
       case 'dispatched_material':
+        if (this.checkedItems.some(item => item.componentRate < 80)) return null;
         return '工单生成';
       case 'pending_dispatch':
-        if (this.checkedItems.some(item => item.componentRate < 80)) return null;
+        if (this.checkedItems.some(item => item.componentRate < 100)) return null;
         return '工单派工';
       case 'dispatched':
         return null;
@@ -359,8 +368,8 @@ export class MaterialDispatchComponent {
     });
   }
 
-  // 工单生成 loading 状态
-  generateLoading = false;
+  // 工单生成 页面 loading 状态
+  pageLoading = false;
 
   handleAction(): void {
     const items = this.checkedItems;
@@ -380,18 +389,28 @@ export class MaterialDispatchComponent {
 
     // 已发料：工单生成
     if (status === 'dispatched_material') {
+      const below80 = items.filter(item => item.componentRate < 80);
+      if (below80.length > 0) {
+        const names = below80.map(item => item.dispatchNo).join('、');
+        this.modal.warning({
+          nzTitle: '到位率不达标',
+          nzContent: `${names} 组件到位率低于80%，无法生成生产工单。`,
+          nzOkText: '知道了'
+        });
+        return;
+      }
       this.generateWorkOrder(items);
       return;
     }
 
     // 待派工：跳转派工页面
     if (status === 'pending_dispatch') {
-      const below80 = items.filter(item => item.componentRate < 80);
-      if (below80.length > 0) {
-        const names = below80.map(item => item.dispatchNo).join('、');
+      const below100 = items.filter(item => item.componentRate < 100);
+      if (below100.length > 0) {
+        const names = below100.map(item => item.dispatchNo).join('、');
         this.modal.warning({
           nzTitle: '到位率不达标',
-          nzContent: `${names} 部件到位率低于80%，无法一键派工。`,
+          nzContent: `${names} 组件到位率未达到100%，无法一键派工。`,
           nzOkText: '知道了'
         });
         return;
@@ -412,7 +431,7 @@ export class MaterialDispatchComponent {
   }
 
   generateWorkOrder(items: MaterialDispatch[]): void {
-    this.generateLoading = true;
+    this.pageLoading = true;
     // 预计算工单明细条数（按 orderNo+partCode+wbs+processNo 去重，与工单明细弹窗一致）
     let totalOrderRows = 0;
     for (const item of items) {
@@ -428,7 +447,7 @@ export class MaterialDispatchComponent {
         item.status = 'pending_dispatch';
         item.checked = false;
       }
-      this.generateLoading = false;
+      this.pageLoading = false;
       this.refreshCheckedStatus();
       this.message.success(`工单生成成功，共 ${totalOrderRows} 条工单明细。`);
     }, 2000);

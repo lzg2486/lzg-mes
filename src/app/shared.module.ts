@@ -23,6 +23,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 // Feedback
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 // Drawer & Others
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
@@ -45,6 +46,7 @@ const NZ_MODULES = [
   NzTagModule,
   NzAlertModule,
   NzModalModule,
+  NzSpinModule,
   NzDrawerModule,
   NzBadgeModule,
 ];

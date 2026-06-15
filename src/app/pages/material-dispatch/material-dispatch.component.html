@@ -67,6 +67,7 @@
 </div>
 
 <!-- 表格 -->
+<nz-spin [nzSpinning]="pageLoading" nzTip="正在生成工单...">
 <div class="table-card">
   <nz-table #dispatchTable [nzData]="listOfData"
     nzSize="small"
@@ -121,8 +122,8 @@
           <nz-tag [nzColor]="getStatusConfig(data.status).color">{{ getStatusConfig(data.status).text }}</nz-tag>
         </td>
         <td nzAlign="center">
-          <ng-container *ngIf="data.status === 'pending_dispatch' || data.status === 'dispatched'; else emptyRate">
-            <div class="rate-cell" [style.cursor]="data.status === 'pending_dispatch' && data.componentRate < 100 ? 'pointer' : 'default'" (click)="data.status === 'pending_dispatch' && openShortage(data)">
+          <ng-container *ngIf="data.status === 'dispatched_material' || data.status === 'pending_dispatch' || data.status === 'dispatched'; else emptyRate">
+            <div class="rate-cell" [style.cursor]="data.status === 'pending_dispatch' && data.componentRate < 100 ? 'pointer' : 'default'" (click)="(data.status === 'pending_dispatch' || data.status === 'dispatched_material') && openShortage(data)">
               <div class="rate-bar-wrapper">
                 <div class="rate-bar-fill" [style.width.%]="data.componentRate"></div>
                 <span class="rate-text">{{ data.componentRate | number:'1.0-0' }}%</span>
@@ -136,12 +137,13 @@
     </tbody>
   </nz-table>
 </div>
+</nz-spin>
 
 <!-- 底部操作+分页栏（与生产订单一致） -->
 <div class="page-footer">
   <div class="footer-left">
     <ng-container *ngIf="actionButton; else noAction">
-      <button nz-button nzType="primary" size="small" [nzLoading]="generateLoading" (click)="handleAction()">
+      <button nz-button nzType="primary" size="small" (click)="handleAction()">
         {{ actionButton }}
       </button>
       <button *ngIf="showRecallButton" nz-button nzType="default" nzDanger size="small" (click)="handleRecall()">
